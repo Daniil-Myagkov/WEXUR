@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<!--
+WEXUR
+Copyright © 2026 Daniil Vasilievich Myagkov (Мягков Даниил Васильевич).
+All rights reserved.
+This file is the original work of Daniil Vasilievich Myagkov.
+Authorship notice must not be removed.
+Sharing unmodified file is permitted.
+Commercial use and derivatives require written permission.
+-->
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="author" content="Daniil Vasilievich Myagkov">
+<meta name="copyright" content="© 2026 Daniil Vasilievich Myagkov. All rights reserved.">
+<meta name="description" content="WEXUR — Wave EXpansion URge: merge tower-defense with 60+ units, local duel, records, 5 languages. © 2026 Daniil Vasilievich Myagkov.">
+<title>WEXUR</title>
+<style>
+html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#3a49c9;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#app{position:fixed;left:50%;top:50%;width:420px;height:840px;transform:translate(-50%,-50%);background:linear-gradient(160deg,#5a6be8,#4053d6 60%,#3a49c9);border-radius:18px;box-shadow:0 0 0 6px #ffd23f,0 10px 40px rgba(0,0,0,.5);overflow:hidden;font-family:system-ui,Arial,sans-serif;color:#fff}
+.screen{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center}.hidden{display:none!important}
+h1{font-size:44px;margin:50px 0 2px;letter-spacing:2px}
+.sub{font-size:13px;opacity:.85;margin-bottom:8px}
+h2{font-size:24px;margin:14px 0 8px}
+.bigBtn{font-size:19px;font-weight:700;padding:11px 24px;border:none;border-radius:16px;color:#fff;background:linear-gradient(#ffb63d,#ff8f3d);box-shadow:0 4px 0 #c96a1a;cursor:pointer;margin:5px}
+.bigBtn.alt{background:linear-gradient(#7fd4ff,#4aa8e8);box-shadow:0 4px 0 #2a7ab0}.bigBtn:disabled{filter:grayscale(1);opacity:.5}
+.hint{font-size:12px;opacity:.85;margin:6px 16px;text-align:center}
+#toast{position:fixed;left:50%;top:14%;transform:translateX(-50%);background:rgba(10,12,40,.95);color:#fff;padding:10px 14px;border-radius:12px;font-weight:700;z-index:400;display:none;font-size:15px;align-items:center;gap:10px;border:2px solid #ffd23f;max-width:90%}
+#toastX{border:none;background:#ff5d7a;color:#fff;border-radius:8px;padding:4px 10px;font-weight:800;cursor:pointer}
+#blackout{position:fixed;inset:0;background:#000;z-index:300;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:700;text-align:center;padding:20px}
+#confirm,#think{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:center;justify-content:center}
+.cbox{background:#2a327b;border:2px solid #ffd23f;border-radius:16px;padding:16px;text-align:center;font-weight:700}
+.cbox button{display:block;margin:6px auto;border:none;border-radius:10px;padding:8px 20px;font-weight:700;cursor:pointer;color:#fff}
+#cYes{background:#ff5d7a}#cNo{background:#7ed957}#cThink{background:#4aa8e8}#tOk{background:#ffd23f;color:#333}
+#slots,#slots2{display:flex;gap:6px;margin:4px 0;flex-wrap:wrap;justify-content:center}
+.slot{width:50px;height:50px;border-radius:12px;background:rgba(255,255,255,.15);border:2px dashed rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;font-size:26px}
+#cards,#cards2{width:94%;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:7px;padding:4px 0}
+.card{background:rgba(255,255,255,.14);border-radius:14px;padding:7px 10px;display:flex;gap:9px;align-items:center;cursor:grab}
+.card .em{font-size:30px}.card .nm{font-weight:700;font-size:14px}.card .st{font-size:11px;opacity:.9}
+.fwrap{position:absolute;top:0;left:0;width:420px;height:840px;transform-origin:top left}
+.fwrap canvas{position:absolute;top:0;left:0}.fgrid{position:absolute;inset:0;z-index:3;pointer-events:none}.ffx{position:absolute;inset:0;z-index:5;pointer-events:none}
+.cell{position:absolute;width:46px;height:46px;border-radius:10px;background:rgba(30,40,90,.55);border:2px solid rgba(255,255,255,.25);pointer-events:auto}
+.unit{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:27px;cursor:grab}
+.unit .lv{position:absolute;top:-6px;right:-6px;background:#4aa8e8;border:2px solid #fff;border-radius:50%;width:18px;height:18px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Segoe UI Symbol','Segoe UI Emoji',system-ui,sans-serif}
+.unit .tr{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);font-size:8px;font-family:'Segoe UI Symbol','Segoe UI Emoji',system-ui,sans-serif;white-space:nowrap;letter-spacing:-1px;max-width:44px;overflow:hidden}
+.unit .ek{position:absolute;top:-6px;left:-6px;background:#ff8f3d;border:2px solid #fff;border-radius:9px;min-width:18px;height:18px;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 2px}
+.flo{position:absolute;font-size:16px;font-weight:700;animation:fl .9s forwards;text-shadow:0 2px 3px rgba(0,0,0,.5)}
+@keyframes fl{from{opacity:1}to{opacity:0;transform:translateY(-40px)}}
+.fbot{position:absolute;left:0;right:0;background:rgba(0,0,30,.4);padding:6px 8px;display:flex;align-items:center;gap:5px;z-index:6;flex-wrap:wrap}
+.fbot .deck{display:flex;gap:5px;flex:1;justify-content:center}
+.dk{width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer}
+.dk:hover{background:rgba(255,255,255,.28)}
+.finfo{font-size:12px;font-weight:700}
+.btnSum{font-size:15px;font-weight:800;border:none;border-radius:12px;padding:10px 12px;color:#fff;background:linear-gradient(#ffb63d,#ff8f3d);box-shadow:0 3px 0 #c96a1a;cursor:pointer}
+.btnUp{font-size:15px;font-weight:800;border:none;border-radius:12px;padding:10px 12px;color:#fff;background:#7ed957;box-shadow:0 3px 0 #4a9030;cursor:pointer}
+.btnQuit{font-size:15px;font-weight:800;border:none;border-radius:12px;padding:10px 12px;color:#fff;background:#ff5d7a;cursor:pointer}
+#hud{position:absolute;top:0;left:0;right:0;z-index:6;display:flex;align-items:center;gap:6px;padding:8px 10px;background:rgba(0,0,30,.35);font-size:14px;font-weight:700;flex-wrap:wrap}
+#hud .sp{margin-left:auto}#hud button{font-size:18px;border:none;border-radius:10px;padding:4px 10px;background:#ffd23f;cursor:pointer}#btnHome{background:#ff5d7a!important;color:#fff}#btnQuit{background:#ff5d7a!important;color:#fff}
+#btnDuelPause{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:20;font-size:18px;border:none;border-radius:10px;padding:4px 10px;background:#ffd23f;cursor:pointer}
+#popup{position:absolute;left:50%;transform:translateX(-50%);bottom:92px;z-index:8;background:rgba(20,25,70,.95);border:2px solid #ffd23f;border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:14px}
+#popup button{border:none;border-radius:10px;padding:8px 12px;font-size:15px;font-weight:700;cursor:pointer}#btnUpg{background:#7ed957;color:#fff}#btnPopClose{background:#ff5d7a;color:#fff}
+#recTabs{display:flex;gap:6px;margin:4px}.rtab{font-size:14px;font-weight:800;border:2px solid transparent;border-radius:12px;padding:7px 12px;background:rgba(255,255,255,.2);color:#fff;cursor:pointer;opacity:.6}.rtab.on{opacity:1;border-color:#fff}
+#recList{width:92%;flex:1;overflow-y:auto;background:rgba(255,255,255,.1);border-radius:14px;padding:8px;position:relative}
+.rec{display:flex;gap:6px;align-items:center;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.15);font-size:13px;flex-wrap:wrap}.rec .star{border:none;background:none;font-size:18px;cursor:pointer}
+#recName{font-size:17px;padding:9px;border-radius:12px;border:none;width:180px;text-align:center;margin:5px}#recColorIn{width:56px;height:38px;border:none;border-radius:10px;background:none;cursor:pointer}
+.rowC{display:flex;align-items:center}#ghost{position:fixed;z-index:99;font-size:38px;pointer-events:none;transform:translate(-50%,-50%)}
+#gTabs{display:flex;gap:6px;margin:4px;flex-wrap:wrap;justify-content:center}.gtab{font-size:13px;font-weight:800;border:2px solid transparent;border-radius:12px;padding:7px 11px;color:#fff;cursor:pointer;opacity:.55}.gtab.on{opacity:1;border-color:#fff}
+#gList{width:94%;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:4px 0}
+.grow{display:flex;gap:7px;align-items:center;background:rgba(255,255,255,.14);border-radius:12px;padding:7px 9px;cursor:pointer}.grow .em{font-size:26px}.grow .nm{font-weight:700}.grow .st{font-size:11px}.grow b{margin-left:auto}
+.tb{font-size:10px;font-weight:800;border-radius:8px;padding:2px 6px;color:#fff}
+#gDetail{width:94%;flex:1;overflow-y:auto;background:rgba(20,25,70,.6);border:2px solid #ffd23f;border-radius:14px;padding:10px;display:flex;flex-direction:column;align-items:center;text-align:center;font-size:14px}#gdStats{margin:6px;line-height:1.5}
+#rulesList{width:92%;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:4px 0}.rl{background:rgba(255,255,255,.14);border-radius:12px;padding:8px 10px;font-size:12px;line-height:1.4}.rl b{color:#ffd93d}
+#dualNames input{font-size:16px;padding:8px;border-radius:10px;border:none;width:140px;margin:4px;text-align:center}
+.dselRow{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin:3px 0}
+.dselCard{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;border:2px solid transparent}
+.dselCard.sel1{border-color:#ff8f3d;background:rgba(255,143,61,.25)}.dselCard.sel2{border-color:#4aa8e8;background:rgba(74,168,232,.25)}
+.dselSlots{display:flex;gap:4px;margin:4px 0;min-height:38px}
+.dselSlot{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.1);border:2px dashed rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:20px}
+.dselLabel{font-size:13px;font-weight:700;margin:2px 0}
+.dselHint{font-size:11px;opacity:.8;text-align:center;margin:2px}
+.dualWinner{font-size:22px;font-weight:900}.dualLoser{font-size:16px;font-weight:700;opacity:.7}
+#saveInd{position:absolute;top:5px;right:5px;font-size:10px;color:#7ed957;opacity:0;transition:opacity 0.3s}
+#saveInd.show{opacity:1}
+.langBtn{font-size:16px;font-weight:700;padding:8px 16px;border:none;border-radius:12px;color:#fff;background:linear-gradient(#9b59b6,#8e44ad);box-shadow:0 3px 0 #5e3370;cursor:pointer;margin:5px}
+#rightsBox{width:92%;flex:1;overflow-y:auto;background:rgba(20,25,70,.6);border:2px solid #ffd23f;border-radius:14px;padding:12px;font-size:13px;line-height:1.55;text-align:left}
+#rightsBox .fp{background:rgba(0,0,20,.5);border-radius:10px;padding:6px 8px;margin:6px 0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;word-break:break-all}
+#deckInfo{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:520;display:flex;align-items:center;justify-content:center}
+#deckInfo .cbox{max-width:340px;max-height:80%;overflow-y:auto;text-align:left}
+</style></head><body>
+<div id="app">
+<div id="menu" class="screen"><h1>WEXUR</h1><div class="sub" data-i18n="subtitle">Wave EXpansion URge</div>
+<button id="btnLang" class="langBtn">🌐 RU</button>
+<button id="btnContinue" class="bigBtn hidden" data-i18n="continue">💾 Продолжить</button>
+<button id="btnPlay" class="bigBtn" data-i18n="play">▶️ Играть</button><button id="btnChallenge" class="bigBtn alt" data-i18n="challenge">🎲 Вызов</button>
+<button id="btnDual" class="bigBtn alt" data-i18n="duel">👥 Дуэль</button>
+<button id="btnGuide" class="bigBtn alt" data-i18n="guide">📖 Справочник</button>
+<button id="btnRules" class="bigBtn alt" data-i18n="compat">⚠️ Совместимость</button><button id="btnRecords" class="bigBtn alt" data-i18n="records">🏆 Рекорды</button>
+<button id="btnRights" class="bigBtn alt" data-i18n="rights">⚖️ Права</button>
+<div class="hint" data-i18n="mergeHint">Слияние: одинаковые ранги · жизнь одна</div></div>
+<div id="rules" class="screen hidden"><h2 data-i18n="compatTitle">⚠️ Совместимость</h2><div id="rulesList"></div><button id="btnRulesBack" class="bigBtn alt">🏠</button></div>
+<div id="guide" class="screen hidden"><h2 data-i18n="guideTitle">📖 Справочник</h2><div id="gTabs"></div><div id="gList"></div>
+<div id="gDetail" class="hidden"><div id="gdHead"></div><div id="gdStats"></div>
+<div class="rowC"><button id="gdLm" class="bigBtn alt" data-i18n="rankMinus">ранг−</button><button id="gdLp" class="bigBtn" data-i18n="rankPlus">ранг＋</button></div>
+<div class="rowC"><button id="gdTm" class="bigBtn alt" data-i18n="starMinus">★−</button><button id="gdTp" class="bigBtn" data-i18n="starPlus">★＋</button></div>
+<button id="gdBack" class="bigBtn alt" data-i18n="back">⬅️ Назад</button></div><button id="btnGuideBack" class="bigBtn alt">🏠</button></div>
+<div id="select" class="screen hidden"><h2 data-i18n="chooseTeam">Выбери команду</h2><div id="slots"></div>
+<div class="hint" data-i18n="selectHint">Одинаковые ранги при слиянии! 🎥 нельзя первой. 🌠/♑ нельзя с ⚓.</div><div id="cards"></div>
+<button id="btnStart" class="bigBtn" disabled data-i18n="startBattle">⚔️ Начать бой</button></div>
+<div id="dualSel" class="screen hidden"><h2 style="margin:4px 0 2px" data-i18n="duelTitle">👥 Дуэль</h2>
+<div id="dualNames"><input id="dn1" maxlength="10" placeholder="Игрок 1" data-i18n-ph="player1"><input type="color" id="dc1" value="#ff8f3d" style="width:36px;height:30px;border:none;border-radius:8px;vertical-align:middle"><br><input id="dn2" maxlength="10" placeholder="Игрок 2" data-i18n-ph="player2"><input type="color" id="dc2" value="#4aa8e8" style="width:36px;height:30px;border:none;border-radius:8px;vertical-align:middle"></div>
+<div class="dselHint" data-i18n="duelHint">Тапни карточку → в активный слот. Оба выбирают НЕЗАВИСИМО. 🌠/♑ нельзя с ⚓.</div>
+<div class="dselLabel" id="dsActiveLbl">Активный: Игрок 1</div>
+<div class="dselSlots" id="dsSlots1"></div>
+<div class="dselSlots" id="dsSlots2"></div>
+<div class="dselRow" id="dsCards"></div>
+<button id="btnDualRandom" class="bigBtn alt" data-i18n="random">🎲 Random</button>
+<button id="btnDualGo" class="bigBtn" disabled data-i18n="goBattle">⚔️ В БОЙ</button>
+<button id="btnDualSwap" class="bigBtn alt" data-i18n="swapPlayer">🔄 Сменить игрока</button>
+<button id="btnDualBack" class="bigBtn alt">🏠</button>
+</div>
+<div id="records" class="screen hidden"><h2 data-i18n="recordsTitle">🏆 Рекорды</h2><div id="recTabs"></div><div id="recList"><div id="saveInd">💾 Saved!</div></div><button id="btnRecBack" class="bigBtn alt">🏠</button></div>
+<div id="rights" class="screen hidden"><h2 data-i18n="rightsTitle">⚖️ Права и авторство</h2><div id="rightsBox"></div><button id="btnRightsBack" class="bigBtn alt">🏠</button></div>
+<div id="game" class="screen hidden">
+<div id="hud"><span id="hudLives">❤️1</span><span id="hudLevel">Ур.1 👾0/20</span><span id="hudSpark">✨60</span><span id="hudTime">⏱0:00</span><span class="sp"></span><button id="btnQuit">❌</button><button id="btnHome">🏠</button><button id="btnPause">⏸</button></div>
+<button id="btnDuelPause" class="hidden">⏸</button>
+<div class="fwrap" id="fw0"><canvas id="cv0"></canvas><div class="fgrid" id="grid0"></div><div class="ffx" id="fx0"></div></div>
+<div class="fwrap hidden" id="fw1"><canvas id="cv1"></canvas><div class="fgrid" id="grid1"></div><div class="ffx" id="fx1"></div></div>
+<div class="fbot" id="bot0" style="bottom:0"><span class="finfo" id="info0"></span><div class="deck" id="deck0"></div><button class="btnSum" id="sum0">✨5</button><button class="btnUp" id="upg0">⬆️</button><button class="btnQuit" id="quit0">❌</button></div>
+<div class="fbot hidden" id="bot1" style="bottom:0"><span class="finfo" id="info1"></span><div class="deck" id="deck1"></div><button class="btnSum" id="sum1">✨5</button><button class="btnUp" id="upg1">⬆️</button><button class="btnQuit" id="quit1">❌</button></div>
+<div id="popup" class="hidden"><span id="popInfo"></span><button id="btnUpg">⬆️</button><button id="btnPopClose">✖</button></div></div>
+<div id="over" class="screen hidden"><h2 id="overTitle">💀 Игра окончена</h2><div id="overStats" style="font-size:17px;font-weight:700;text-align:center"></div>
+<input id="recName" maxlength="12" placeholder="Имя" data-i18n-ph="name"><div class="rowC"><input type="color" id="recColorIn" value="#ffd93d"><span data-i18n="color">цвет</span></div>
+<div class="rowC"><button id="btnSaveRec" class="bigBtn" data-i18n="save">💾 Сохранить</button><button id="btnToMenu" class="bigBtn alt">🏠</button></div></div>
+</div>
+<div id="ghost" class="hidden"></div><div id="toast"><span id="toastTxt"></span><button id="toastX">✖</button></div>
+<div id="blackout" class="hidden" data-i18n="blackout">🎥 Кинокамера закрыла доступ на 30 секунд</div>
+<div id="confirm" class="hidden"><div class="cbox"><div id="confirmTxt" data-i18n="confirmExit">Вы уверены, что хотите завершить игру?</div><button id="cYes" data-i18n="yes">Да</button><button id="cNo" data-i18n="no">Нет</button><button id="cThink" data-i18n="think">Подумаю...</button></div></div>
+<div id="think" class="hidden"><div class="cbox"><span data-i18n="thinkMsg">Ну ладно, подумай 😄</span><button id="tOk">OK</button></div></div>
+<div id="deckInfo" class="hidden"><div class="cbox"><div id="dkInfoHead" style="text-align:center"></div><div id="dkInfoBody" style="margin:8px 0;font-weight:400;font-size:13px;line-height:1.5"></div><button id="btnDeckClose" class="bigBtn" style="display:block;margin:6px auto">▶️ Продолжить</button></div></div>
+<script>
+"use strict";const W=420,H=840,app=document.getElementById('app');const $=id=>document.getElementById(id);
+// ==================== AUTHOR / VERSION / LICENSE ====================
+const AUTHOR='Daniil Vasilievich Myagkov';
+const AUTHOR_RU='Мягков Даниил Васильевич';
+const VERSION='1.1';
+const RIGHTS_YEAR='2026';
+let shaHex='computing...';
+function computeSha(){
+const canon=['WEXUR',AUTHOR,AUTHOR_RU,VERSION,'merge=same-rank-only','duel=local-only','no-network','langs=ru/en/es/fr/zh','deck-pause-info=on'].join('|');
+try{
+if(window.crypto&&crypto.subtle){
+crypto.subtle.digest('SHA-256',new TextEncoder().encode(canon)).then(b=>{
+shaHex=Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+if(state==='rights')renderRights();
+}).catch(()=>{shaHex='SHA-256 unavailable';});
+}else{shaHex='SHA-256 unavailable in this browser context';}
+}catch(e){shaHex='SHA-256 error';}
+}
+// ==================== LOCALIZATION SYSTEM ====================
+const LANGS = ['ru','en','es','fr','zh'];
+let currentLang = localStorage.getItem('wexur_lang') || 'ru';
+const L = {
+ru:{
+subtitle:"Wave EXpansion URge",continue:"💾 Продолжить",play:"▶️ Играть",challenge:"🎲 Вызов",duel:"👥 Дуэль",guide:"📖 Справочник",compat:"⚠️ Совместимость",records:"🏆 Рекорды",mergeHint:"Слияние: одинаковые ранги · жизнь одна",
+compatTitle:"⚠️ Совместимость",guideTitle:"📖 Справочник",rankMinus:"ранг−",rankPlus:"ранг＋",starMinus:"★−",starPlus:"★＋",back:"⬅️ Назад",
+chooseTeam:"Выбери команду",selectHint:"Одинаковые ранги при слиянии! 🎥 нельзя первой. 🌠/ нельзя с ⚓.",startBattle:"⚔️ Начать бой",
+duelTitle:"👥 Дуэль",player1:"Игрок 1",player2:"Игрок 2",duelHint:"Тапни карточку → в активный слот. Оба выбирают НЕЗАВИСИМО. 🌠/♑ нельзя с ⚓.",random:"🎲 Случайно",goBattle:"⚔️ В БОЙ",swapPlayer:"🔄 Сменить игрока",activeP:"Активный: Игрок ",
+recordsTitle:"🏆 Рекорды",tabNorm:"Обычные",tabChal:"Вызов",tabDuel:"Поединки",empty:"Пусто.",name:"Имя",color:"цвет",save:"💾 Сохранить",
+blackout:"🎥 Кинокамера закрыла доступ на 30 секунд",confirmExit:"Вы уверены, что хотите завершить игру?",yes:"Да",no:"Нет",think:"Подумаю...",thinkMsg:"Ну ладно, подумай 😄",
+gameOver:"💀 Игра окончена",breach:"Прорыв!",youWin:"🏆 Вы победили!",youLose:"💀 Вы проиграли",draw:"🤝 НИЧЬЯ!",winner:"Победил ",
+lvlUp:"Уровень ",host:"Хост: ",guest:"Гость: ",opp:"Оппонент: ",preview:" предпросмотр",saved:"💾 Сохр.",
+atk:"АТАКА",semi:"ПОЛУ",sup:"ПОДДЕРЖКА",risk:"РИСК",
+rights:"⚖️ Права",rightsTitle:"⚖️ Права и авторство",rightsIntro:"WEXUR — авторская игра Мягкова Даниила Васильевича. Уведомление об авторстве нельзя удалять. Размещение неизменённого файла разрешено. Коммерческое использование и производные работы требуют письменного разрешения.",rightsLicense:"© 2026 Мягков Даниил Васильевич. Все права защищены. Вы можете размещать и распространять этот файл с сохранённым уведомлением об авторстве. Присваивать авторство запрещено. Коммерческое использование, платное распространение и закрытые производные версии требуют письменного разрешения автора.",author:"Автор",version:"Версия",sha:"SHA-256 конфигурации",closeResume:"▶️ Продолжить",errNoMerge:"❌ Эти юниты не сливаются!",deckHint:"Игра на паузе. Закрой окно, чтобы продолжить.",
+desc_sun:"Эталон баланса. При слиянии 75% остаётся собой. Рядом с 🏵️ оба +5% скорости.",
+desc_donut:"Тяжёлая артиллерия. На ★4: 35% остановить врага на 2с.",
+desc_astra:"Бьёт в случайного. На ★4: 8% шанс двойного урона ЗА КАЖДЫЙ выстрел. Рядом с ♑ ОБА получают +20% урона. Рядом с 🌻 +5% скорости.",
+desc_cherry:"Двойной выстрел (голова+хвост). 🌸 рядом +2%. +13% урона если граничит с 📐 или 💠.",
+desc_grape:"AoE по всем, КРОМЕ босса 🐲.",
+desc_planet:"Бьёт в последнего. Блок от 🟢.  рядом +9%.",
+desc_diamond:"Надёжный боец. Наносит 🎠 Карусели ×2.5 урона.",
+desc_disc:"Рулетка слияний.",
+desc_maple:"7% +2 ранга. Рядом с 🪱 +40%.",
+desc_juice:"На 5 ур. даёт другим 🧃 +10% урона (стак).",
+desc_teddy:"87 урона, не двиг., усыпляет соседей. 45% собой.",
+desc_sakura:"Розовые. +2% 🍒. На 3 ур. → 🍒 каждые 25с. Наносит 🎠 ×2.5.",
+desc_lion:"Добил последнего → 30% +5✨.",
+desc_algae:"15/с, урон 4. 8%/45с +1 ранг. ⚽ +10%. ♑ рядом +10%.",
+desc_pumpkin:"Сильный, 20% собой. Рядом с 🧋 +20% урона.",
+desc_tangerine:"Слив с 🫖. 55% собой.",
+desc_ball:"Мощный, 1% ноль. ✳️ рядом +10%.",
+desc_teapot:"Скорострельный середняк. Слив с 🍊.",
+desc_radar:"1070 урон, 0.1/с. Блок от ⚫. Один выключился — все молчат. 💠 рядом +5%.",
+desc_fuel:"Чёт ×3 скр, нечёт ÷3. 43% собой.",
+desc_plane:"Уголок +13%. 🟡 рядом −3%. Двиг. после 10 ур. Скорость 4.5.",
+desc_sleepy:"Цикл 30с сон/30с актив. +5% ур за 🧃✳️🫒. +13% скр за 🛬. Не морозится ⛄.",
+desc_candy:"3/17 спам. 60% собой.",
+desc_urn:"45с работает, затем затихает. Жертва: перетаскивание подвижного перса 1 ур (35% +1 ур урне) ИЛИ 🚉 (+35✨). 🟢 рядом +7% скр. 🧋 рядом +22% скр. 53% собой.",
+desc_bubble:"Бьёт ТОЛЬКО 👻🦠🚁. Чёрные кружки. Скорость 4.4. 🎃 рядом +20% урона (единоразово). ⚱️🛢️🔌 рядом +22% скр (единоразово).",
+desc_worm:"Бьёт ТОЛЬКО 🦠🐲.  рядом +40% (единоразово). Каждые 60с с 5% рожает 🍅 рядом.",
+desc_tomato:"Скрытый. Бьёт ТОЛЬКО 🐲. 300/30. Не берётся в команду.",
+desc_star:"31/1.6. Если ГРАНИЧИТ только с 💠/ (или ни с кем) → ×2.5 урон. Если граничит с кем-то другим (включая другую 🌠) → НЕ стреляет. Проверка строго по соседним клеткам, НЕ по полю. Двигается только с 19 ур. 5% собой. Нельзя брать вместе с ⚓.",
+desc_capri:"8/3.7. НЕПОДВИЖЕН. Рядом с 🏵️ ОБА получают +20% урона. 📈 рядом ×3 урон (стак). ✳️ рядом +10%. Если улучшался (уровень/звёзды) в последние 60с → ×4 скр. НЕ стреляет если ГРАНИЧИТ с персом вне 📈🥥️✳️ (или с другим ♑) — проверка строго по соседним клеткам, НЕ по полю. −12✨/35с за каждого ♑. 37% собой. Нельзя с ⚓. Можно сливать с 🔁.",
+desc_lilac:"6/8.5 спам. Наносит 🎠 ×2.5.",
+desc_billiard:"155 урона, 3/с. НО: каждый уровень, если Бильярд не сливался и не прокачивался звёздами, его урон падает в 3 раза. Слияние или прокачка сбрасывает счётчик.",
+desc_eagle:"Каждое убийство, совершённое именно его снарядом, навсегда даёт +3% к его урону. Показывается как 🦅N. На поле максимум 4 орла. При слиянии 25% шанс остаться собой.",
+desc_can:"7 урона, 22/с. Стреляет в последнего случайного. С шансом 45% (+4%/прокачка) бьёт ДВУХ случайных. 46% собой.",
+desc_hourglass:"21 урона, 4.3/с. Замедляет ВСЕХ монстров на 25% (не суммируется). С 3+ ур. запрещает стрелять ГРАНИЧАЩИМ соседям (слева/справа/сверху/снизу). Неподвижен. −15✨/30с за каждые часы.",
+desc_lava:"Лужи 35%+5%/прокачка, 15%HP/с ×3, жжёт 🌹/️. 50% собой.",
+desc_eclipse:"Неподв. Зона тьмы: −40% скр врагам, +20% урон им, +15% своим. 45% собой.",
+desc_kiwi:"Быстрый 🟡, бьёт заднего.",
+desc_barrel:"Макс 2, зазор 35%, ≤3.5с, редко. Урон 111, скорость 1. 🧋 рядом +22% скр.",
+desc_solar:"Луч до 53% HP. Урон 18. 🪐+9%.",
+desc_dog:"23.1/с. +15%/🦮. +12% ур от 🌹. СТРЕЛЯЕТ ВСЕГДА (нет минуса за 🟢).",
+desc_yarn:"Шары пробивают волну, бьют босса, взрывают 🌹/️. Скорость 1.2.",
+desc_cloud:"Зона дождя 8с, %HP. Скорость 13.",
+desc_balloon:"Слив с 🟢. 15% собой. Скорость 9.8.",
+desc_triangle:"Мощный + ловушки. 59% собой. Скорость 1.2. +13% урона если граничит с 💠.",
+desc_melon:"+30✨/ур за каждого 🍉. Скорость 1.2.",
+desc_ext:"Горение ×1.5. Скорость 2.8.",
+desc_fern:"Саморост по таймеру. Урон 29.",
+desc_heart:"×1.5–4.5 соседям. НЕ лечит врагов.",
+desc_amur:"Лечит врагов слабо. Ward до 4%.",
+desc_lady:"Отброс без урона. Скорость 3.2. Шанс откидывания растёт с 0.7% до 12% при прокачке.",
+desc_station:"55 урона, 2.6/с. НЕподвижен, НЕ сливается, НЕ меняется ⚓. 🟡 слева/справа ×6 скр. Жертва ⚱️ +35✨.",
+desc_magnet:"Каждые 8 секунд уменьшает разброс всех живых монстров до 45% вокруг их средней позиции. Волна сбивается в плотный комок без массового отката к финишу/старту. Усилитель всего AoE-класса.",
+desc_hook:"🟢. 73 фикс, 0.05/с. Промах 90%−2.5%/прокачка. +25✨ за хит.",
+desc_rose:"Шипы макс 30, ×1.35. Урон 45, скорость 4.6.",
+desc_snow:"Заморозка ~25–65%. Урон 53.",
+desc_coco:"Слияние ✨×5.",
+desc_disco:"Боец + аура +22.5%.",
+desc_clover:"Удача +39% для 🟢.",
+desc_graph:"Слияние +1 ранг (цель ≤ур×2). −30✨/20с. Неподв.",
+desc_battery:"+30–40% скр /4с.",
+desc_portal:"Возврат на старт до 45%. 📡+5%. +13% урона если граничит с 📐.",
+desc_olive:"Лозы ×2.2, макс 9.",
+desc_salt:"53 урона, 3/с, белые кружки. Каждые 12с с шансом 30% (+5%/прокачка) следующий удар замедляет монстра на 20с. Свой таймер. Не кач. звёздами.",
+desc_vase:"Копирует скр 100%, урон 75%−5%/ур. Не кач. звёздами. ⚫ блок.",
+desc_anchor:"130/3, не кач. звёздами. Меняется с неподвижными (кроме 🚉). 5% собой. Нельзя с 🌠/.",
+desc_gift:"75% случайный.",
+desc_trans:"63%+5%/★ дубль. −10✨/30с. Скорость 1.5. МОЖЕТ дублировать ♑.",
+desc_uran:"5–85✨, душит соседей.",
+desc_plug:"✨×6.25 или ⚡.  рядом +22% скр.",
+desc_gem:"200/2.1, блок при соседе. ⚫. Наносит 🎠 ×2.5.",
+desc_key:"7 → Особый Перс. После Буратино ключи исчезают. С 20 ур. автоудаление.",
+desc_snake:"Ряд +20%/змею. НЕ стреляет если в ряду есть хоть один 🟠 или 🟢. Сосед ≠🟢/змея → −60% скр. Неподв.",
+desc_cam:"25% 🎥10, иначе сброс.",
+desc_buratino:"Скрытый. Растёт сам 15с (75%/25% стоп), кап 7.",
+desc_dino:"🦖 ДИНО (монстр). Появляется с 15 ур. Очень много HP, медленный. Получает 100% урона от 🟠 Атаки и 80% урона от 🟡 Полу, 🟢 Поддержки и ⚫ Рисков.",
+desc_carousel:"🎠 КАРУСЕЛЬ (монстр). Появляется с 5 ур. Как 👾 по HP/скорости, но получает ×0.4 урона от всех, кром 🌸🪻♦️ (те наносят ×2.5)."
+},
+en:{
+subtitle:"Wave EXpansion URge",continue:"💾 Continue",play:"▶️ Play",challenge:"🎲 Challenge",duel:"👥 Duel",guide:"📖 Guide",compat:"⚠️ Synergy",records:"🏆 Records",mergeHint:"Merge: same ranks · one life",
+compatTitle:"⚠️ Synergy Rules",guideTitle:"📖 Guide",rankMinus:"rank−",rankPlus:"rank＋",starMinus:"★−",starPlus:"★＋",back:"⬅️ Back",
+chooseTeam:"Choose Team",selectHint:"Same ranks to merge! 🎥 can't be first. 🌠/ can't be with ⚓.",startBattle:"⚔️ Start Battle",
+duelTitle:"👥 Duel",player1:"Player 1",player2:"Player 2",duelHint:"Tap card → active slot. Both choose INDEPENDENTLY. 🌠/ can't be with ⚓.",random:"🎲 Random",goBattle:"⚔️ GO",swapPlayer:"🔄 Swap Player",activeP:"Active: Player ",
+recordsTitle:"🏆 Records",tabNorm:"Normal",tabChal:"Challenge",tabDuel:"Duels",empty:"Empty.",name:"Name",color:"color",save:"💾 Save",
+blackout:"🎥 Camera blocked access for 30 seconds",confirmExit:"Are you sure you want to quit?",yes:"Yes",no:"No",think:"Let me think...",thinkMsg:"Alright, take your time 😄",
+gameOver:"💀 Game Over",breach:"Breach!",youWin:"🏆 You Won!",youLose:"💀 You Lost",draw:"🤝 DRAW!",winner:"Winner: ",
+lvlUp:"Level ",host:"Host: ",guest:"Guest: ",opp:"Opponent: ",preview:" preview",saved:"💾 Saved",
+atk:"ATTACK",semi:"SEMI",sup:"SUPPORT",risk:"RISK",
+rights:"⚖️ Rights",rightsTitle:"⚖️ Rights & Authorship",rightsIntro:"WEXUR is the original game of Daniil Vasilievich Myagkov. Authorship notice must not be removed. Sharing unmodified file is permitted. Commercial use and derivatives require written permission.",rightsLicense:"© 2026 Daniil Vasilievich Myagkov. All rights reserved. You may host and share this file with intact authorship notice. You may not claim authorship. Commercial use, paid redistribution, and closed derivatives require written permission from the author.",author:"Author",version:"Version",sha:"SHA-256 configuration",closeResume:"▶️ Resume",errNoMerge:"❌ These units cannot merge!",deckHint:"Game paused. Close this window to continue.",
+desc_sun:"Balance standard. 75% stays itself on merge. Next to 🏵️ both get +5% rate.",
+desc_donut:"Heavy artillery. At ★4: 35% chance to stun enemy for 2s.",
+desc_astra:"Hits random target. At ★4: 8% double damage PER shot. Next to ♑ BOTH get +20% dmg. Next to 🌻 +5% rate.",
+desc_cherry:"Double shot (head+tail). 🌸 nearby +2%. +13% dmg if adjacent to 📐 or 💠.",
+desc_grape:"AoE to ALL, EXCEPT boss 🐲.",
+desc_planet:"Hits last. Blocked by 🟢.  nearby +9%.",
+desc_diamond:"Reliable fighter. Deals ×2.5 dmg to 🎠 Carousel.",
+desc_disc:"Merge roulette.",
+desc_maple:"7% chance +2 ranks. Next to 🪱 +40%.",
+desc_juice:"At lvl 5 gives other 🧃 +10% dmg (stacks).",
+desc_teddy:"87 dmg, immovable, puts neighbors to sleep. 45% stays itself.",
+desc_sakura:"Pink ones. +2% 🍒. At lvl 3 → spawns 🍒 every 25s. Deals ×2.5 to 🎠.",
+desc_lion:"Killed the last one → 30% chance +5✨.",
+desc_algae:"15/s, 4 dmg. 8%/45s +1 rank. ⚽ +10%. ♑ nearby +10%.",
+desc_pumpkin:"Strong, 20% stays itself. Next to 🧋 +20% dmg.",
+desc_tangerine:"Merges with 🫖. 55% stays itself.",
+desc_ball:"Powerful, 1% zero dmg. ✳️ nearby +10%.",
+desc_teapot:"Fast mid-range. Merges with 🍊.",
+desc_radar:"1070 dmg, 0.1/s. Blocked by ⚫. If one turns off, all go silent. 💠 nearby +5%.",
+desc_fuel:"Even count ×3 rate, odd ÷3. 43% stays itself.",
+desc_plane:"Corner +13%. 🟡 nearby −3%. Moves after lvl 10. Rate 4.5.",
+desc_sleepy:"Cycle 30s sleep/30s active. +5% dmg per 🧃✳️. +13% rate per 🛬. Immune to ⛄.",
+desc_candy:"3/17 spam. 60% stays itself.",
+desc_urn:"Works 45s, then silences. Sacrifice: drag mobile unit 1 rank (35% +1 rank to urn) OR 🚉 (+35✨). 🟢 nearby +7% rate. 🧋 nearby +22% rate. 53% stays itself.",
+desc_bubble:"Hits ONLY 👻🦠🚁. Black circles. Rate 4.4. 🎃 nearby +20% dmg (once). ⚱️️🔌 nearby +22% rate (once).",
+desc_worm:"Hits ONLY 🦠. 🍁 nearby +40% (once). Every 60s 5% chance to spawn 🍅 nearby.",
+desc_tomato:"Hidden. Hits ONLY 🐲. 300/30. Cannot be selected.",
+desc_star:"31/1.6. ×2.5 dmg if ADJACENT only to 💠/ (or no one); otherwise doesn't shoot. Check strictly by adjacent cells. Moves only from lvl 19. 5% stays itself. Can't be with ⚓.",
+desc_capri:"8/3.7. IMMOVABLE. Next to 🏵️ BOTH get +20% dmg. 📈 nearby ×3 dmg (stacks). ✳️ nearby +10%. If upgraded in last 60s → ×4 rate. DOES NOT shoot if ADJACENT to unit outside 📈️✳️ (or another ♑) — check strictly by adjacent cells. −12✨/35s per ♑. 37% stays itself. Can't be with ⚓. Can merge with 🔁.",
+desc_lilac:"6/8.5 spam. Deals ×2.5 to 🎠.",
+desc_billiard:"155 dmg, 3/s. BUT: each level without merge/star upgrade divides dmg by 3. Merge/upgrade resets counter.",
+desc_eagle:"Every kill by its projectile permanently gives +3% dmg. Shown as 🦅N. Max 4 on field. 25% stays itself on merge.",
+desc_can:"7 dmg, 22/s. Hits last random. 45% (+4%/upgrade) chance to hit TWO random. 46% stays itself.",
+desc_hourglass:"21 dmg, 4.3/s. Slows ALL monsters by 25% (doesn't stack). At 3+ lvl blocks ADJACENT neighbors from shooting. Immovable. −15✨/30s per hourglass.",
+desc_lava:"Puddles 35%+5%/upgrade, 15%HP/s ×3, burns 🌹/️. 50% stays itself.",
+desc_eclipse:"Immovable. Dark zone: −40% rate to enemies, +20% dmg to them, +15% to allies. 45% stays itself.",
+desc_kiwi:"Fast 🟡, hits the back one.",
+desc_barrel:"Max 2, gap 35%, ≤3.5s, rare. 111 dmg, 1/s. 🧋 nearby +22% rate.",
+desc_solar:"Beam up to 53% HP. 18 dmg. 🪐+9%.",
+desc_dog:"23.1/s. +15%/🦮 rate. +12% dmg from 🌹. ALWAYS SHOOTS (no penalty from 🟢).",
+desc_yarn:"Balls pierce wave, hit boss, explode 🌹/🛢️. Rate 1.2.",
+desc_cloud:"Rain zone 8s, %HP. Rate 13.",
+desc_balloon:"Merges with 🟢 and itself. 15% stays itself. Rate 9.8.",
+desc_triangle:"Powerful + traps. 59% stays itself. Rate 1.2. +13% dmg if adjacent to 💠.",
+desc_melon:"+30✨/level per 🍉. Rate 1.2.",
+desc_ext:"Burn ×1.5. Rate 2.8.",
+desc_fern:"Self-grows over time. 29 dmg.",
+desc_heart:"×1.5–4.5 to neighbors. DOES NOT heal enemies.",
+desc_amur:"Weakly heals enemies. Ward up to 4%.",
+desc_lady:"Knockback without dmg. Rate 3.2. Knockback chance grows from 0.7% to 12%.",
+desc_station:"55 dmg, 2.6/s. IMMOVABLE, cannot merge, cannot be swapped by ⚓.  left/right ×6 rate. Sacrifice ⚱️ +35✨.",
+desc_magnet:"Every 8s reduces spread of all alive monsters to 45% around their average position. Wave compresses into a dense blob without mass rollback. Amplifies all AoE.",
+desc_hook:"🟢. 73 fixed, 0.05/s. Miss 90%−2.5%/upgrade. +25✨ per hit.",
+desc_rose:"Spikes max 30, ×1.35. 45 dmg, rate 4.6.",
+desc_snow:"Freeze ~25–65%. 53 dmg.",
+desc_coco:"Merge ✨×5.",
+desc_disco:"Fighter + aura +22.5%.",
+desc_clover:"Luck +39% for 🟢.",
+desc_graph:"Merge +1 rank (target ≤lvl×2). −30✨/20s. Immovable.",
+desc_battery:"+30–40% rate /4s.",
+desc_portal:"Return to start up to 45%. 📡+5%. +13% dmg if adjacent to 📐.",
+desc_olive:"Vines ×2.2, max 9.",
+desc_salt:"53 dmg, 3/s, white circles. Every 12s 30% (+5%/upgrade) chance next hit slows monster for 20s. Own timer. Cannot be upgraded by stars.",
+desc_vase:"Copies rate 100%, dmg 75%−5%/lvl. Cannot be upgraded by stars. ⚫ block.",
+desc_anchor:"130/3, cannot be upgraded by stars. Swaps with immovables (except 🚉). 5% stays itself. Can't be with 🌠/.",
+desc_gift:"75% random.",
+desc_trans:"63%+5%/★ duplicate. −10✨/30s. Rate 1.5. CAN duplicate ♑.",
+desc_uran:"5–85✨, chokes = gives.",
+desc_plug:"✨×6.25 or ⚡.  nearby +22% rate.",
+desc_gem:"200/2.1, blocked by neighbor. ⚫. Deals ×2.5 to 🎠.",
+desc_key:"7 → Special Unit. After Buratino keys disappear. Auto-delete at lvl 20.",
+desc_snake:"Row +20%/snake. DOES NOT shoot if row has any 🟠 or 🟢. Neighbor ≠🟢/snake → −60% rate. Immovable.",
+desc_cam:"25% 🎥10, else reset.",
+desc_buratino:"Hidden. Self-grows 15s (75%/25% stop), cap 7.",
+desc_dino:"🦖 DINO (monster). Appears from lvl 15. Huge HP, slow. Takes 100% dmg from 🟠 Attack and 80% dmg from 🟡 Semi, 🟢 Support, ⚫ Risk.",
+desc_carousel:"🎠 CAROUSEL (monster). Appears from lvl 5. Like 👾 in HP/speed, but takes ×0.4 dmg from all except 🌸🪻♦️ (they deal ×2.5)."
+},
+es:{
+subtitle:"Wave EXpansion URge",continue:"💾 Continuar",play:"▶️ Jugar",challenge:"🎲 Desafío",duel:"👥 Duelo",guide:"📖 Guía",compat:"⚠️ Sinergia",records:"🏆 Récords",mergeHint:"Fusión: mismos rangos · una vida",
+compatTitle:"⚠️ Reglas de Sinergia",guideTitle:"📖 Guía",rankMinus:"rango−",rankPlus:"rango＋",starMinus:"★−",starPlus:"★＋",back:"⬅️ Atrás",
+chooseTeam:"Elige Equipo",selectHint:"¡Mismos rangos para fusionar! 🎥 no puede ser primera. 🌠/ no con ⚓.",startBattle:"⚔️ Iniciar Batalla",
+duelTitle:"👥 Duelo",player1:"Jugador 1",player2:"Jugador 2",duelHint:"Toca carta → ranura activa. Ambos eligen INDEPENDIENTEMENTE. 🌠/♑ no con ⚓.",random:"🎲 Aleatorio",goBattle:"⚔️ IR",swapPlayer:"🔄 Cambiar Jugador",activeP:"Activo: Jugador ",
+recordsTitle:"🏆 Récords",tabNorm:"Normal",tabChal:"Desafío",tabDuel:"Duelos",empty:"Vacío.",name:"Nombre",color:"color",save:"💾 Guardar",
+blackout:"🎥 La cámara bloqueó el acceso por 30 segundos",confirmExit:"¿Seguro que quieres salir?",yes:"Sí",no:"No",think:"Lo pensaré...",thinkMsg:"Está bien, piénsalo 😄",
+gameOver:"💀 Fin del Juego",breach:"¡Brecha!",youWin:"🏆 ¡Ganaste!",youLose:"💀 Perdiste",draw:"🤝 ¡EMPATE!",winner:"Ganador: ",
+lvlUp:"Nivel ",host:"Anfitrión: ",guest:"Invitado: ",opp:"Oponente: ",preview:" vista previa",saved:"💾 Guardado",
+atk:"ATAQUE",semi:"SEMI",sup:"APOYO",risk:"RIESGO",
+rights:"⚖️ Derechos",rightsTitle:"⚖️ Derechos y Autoría",rightsIntro:"WEXUR es el juego original de Daniil Vasilievich Myagkov. No se debe eliminar el aviso de autoría. Compartir el archivo sin modificar está permitido. El uso comercial y derivados requieren permiso escrito.",rightsLicense:"© 2026 Daniil Vasilievich Myagkov. Todos los derechos reservados.",author:"Autor",version:"Versión",sha:"SHA-256 config",closeResume:"▶️ Continuar",errNoMerge:"❌ ¡Estas unidades no se fusionan!",deckHint:"Juego en pausa. Cierra esta ventana para continuar.",
+desc_sun:"Equilibrio estándar. 75% se mantiene al fusionar. Junto a 🏵️ ambos +5% vel.",
+desc_donut:"Artillería pesada. En ★4: 35% paralizar enemigo 2s.",
+desc_astra:"Golpea objetivo aleatorio. En ★4: 8% doble daño POR disparo. Junto a ♑ AMBOS +20% daño. Junto a 🌻 +5% vel.",
+desc_cherry:"Doble disparo. 🌸 cerca +2%. +13% daño si adyacente a 📐 o .",
+desc_grape:"AoE a TODOS, EXCEPTO jefe 🐲.",
+desc_planet:"Golpea al último. Bloqueado por 🟢.  cerca +9%.",
+desc_diamond:"Luchador confiable. Hace ×2.5 daño a 🎠 Carrusel.",
+desc_disc:"Ruleta de fusión.",
+desc_maple:"7% +2 rangos. Junto a 🪱 +40%.",
+desc_juice:"En nivel 5 da a otros 🧃 +10% daño (acumula).",
+desc_teddy:"87 daño, inmóvil, duerme vecinos. 45% se mantiene.",
+desc_sakura:"Rosas. +2% 🍒. En nivel 3 → genera 🍒 cada 25s. Hace ×2.5 a 🎠.",
+desc_lion:"Mató al último → 30% +5✨.",
+desc_algae:"15/s, 4 daño. 8%/45s +1 rango. ⚽ +10%. ♑ cerca +10%.",
+desc_pumpkin:"Fuerte, 20% se mantiene. Junto a 🧋 +20% daño.",
+desc_tangerine:"Se fusiona con 🫖. 55% se mantiene.",
+desc_ball:"Poderoso, 1% cero. ✳️ cerca +10%.",
+desc_teapot:"Velocidad media rápida. Se fusiona con 🍊.",
+desc_radar:"1070 daño, 0.1/s. Bloqueado por ⚫. Si uno se apaga, todos callan. 💠 cerca +5%.",
+desc_fuel:"Par ×3 vel, impar ÷3. 43% se mantiene.",
+desc_plane:"Esquina +13%. 🟡 cerca −3%. Se mueve tras nivel 10. Vel 4.5.",
+desc_sleepy:"Ciclo 30s sueño/30s activo. +5% daño por 🧃✳️🫒. +13% vel por 🛬. Inmune a ⛄.",
+desc_candy:"3/17 spam. 60% se mantiene.",
+desc_urn:"Funciona 45s, luego calla. Sacrificio: arrastrar unidad móvil 1 rango (35% +1 rango a urna) O 🚉 (+35✨). 🟢 cerca +7% vel. 🧋 cerca +22% vel. 53% se mantiene.",
+desc_bubble:"Golpea SOLO 👻🦠🚁. Círculos negros. Vel 4.4. 🎃 cerca +20% daño (una vez). ⚱️🛢️🔌 cerca +22% vel (una vez).",
+desc_worm:"Golpea SOLO 🦠🐲.  cerca +40% (una vez). Cada 60s 5% genera 🍅 cerca.",
+desc_tomato:"Oculto. Golpea SOLO 🐲. 300/30. No seleccionable.",
+desc_star:"31/1.6. ×2.5 daño si ADYACENTE solo a 💠/ (o nadie); si no, no dispara. Verificación estricta por celdas adyacentes. Se mueve desde nivel 19. 5% se mantiene. No con ⚓.",
+desc_capri:"8/3.7. INMÓVIL. Junto a 🏵️ AMBOS +20% daño. 📈 cerca ×3 daño (acumula). ✳️ cerca +10%. Si mejoró en últimos 60s → ×4 vel. NO dispara si ADYACENTE a unidad fuera de 📈🥥️✳️ (u otro ♑) — verificación estricta por celdas adyacentes. −12✨/35s por ♑. 37% se mantiene. No con ⚓. Puede fusionarse con 🔁.",
+desc_lilac:"6/8.5 spam. Hace ×2.5 a 🎠.",
+desc_billiard:"155 daño, 3/s. PERO: cada nivel sin fusión/estrellas divide daño por 3. Fusión/estrella reinicia contador.",
+desc_eagle:"Cada muerte por su proyectil da permanentemente +3% daño. Se muestra como 🦅N. Máx 4 en campo. 25% se mantiene al fusionar.",
+desc_can:"7 daño, 22/s. Golpea último aleatorio. 45% (+4%/mejora) golpea DOS aleatorios. 46% se mantiene.",
+desc_hourglass:"21 daño, 4.3/s. Ralentiza TODOS los monstruos 25% (no acumula). En 3+ niv bloquea disparos de vecinos ADYACENTES. Inmóvil. −15✨/30s por reloj.",
+desc_lava:"Charcos 35%+5%/mejora, 15%HP/s ×3, quema 🌹/️. 50% se mantiene.",
+desc_eclipse:"Inmóvil. Zona oscura: −40% vel enemigos, +20% daño a ellos, +15% aliados. 45% se mantiene.",
+desc_kiwi:"Rápido 🟡, golpea al último.",
+desc_barrel:"Máx 2, brecha 35%, ≤3.5s, raro. 111 daño, 1/s. 🧋 cerca +22% vel.",
+desc_solar:"Rayo hasta 53% HP. 18 daño. 🪐+9%.",
+desc_dog:"23.1/s. +15%/🦮 vel. +12% daño de 🌹. SIEMPRE DISPARA (sin penalización de 🟢).",
+desc_yarn:"Bolas atraviesan oleada, golpean jefe, explotan 🌹/️. Vel 1.2.",
+desc_cloud:"Zona de lluvia 8s, %HP. Vel 13.",
+desc_balloon:"Se fusiona con 🟢 y consigo mismo. 15% se mantiene. Vel 9.8.",
+desc_triangle:"Poderoso + trampas. 59% se mantiene. Vel 1.2. +13% daño si adyacente a 💠.",
+desc_melon:"+30✨/nivel por 🍉. Vel 1.2.",
+desc_ext:"Quemadura ×1.5. Vel 2.8.",
+desc_fern:"Crece solo con el tiempo. 29 daño.",
+desc_heart:"×1.5–4.5 a vecinos. NO cura enemigos.",
+desc_amur:"Cura débilmente enemigos. Ward hasta 4%.",
+desc_lady:"Empujón sin daño. Vel 3.2. Probabilidad crece de 0.7% a 12%.",
+desc_station:"55 daño, 2.6/s. INMÓVIL, no fusiona, no cambia por ⚓.  izq/der ×6 vel. Sacrificio ⚱️ +35✨.",
+desc_magnet:"Cada 8s reduce dispersión de todos los monstruos vivos al 45% alrededor de su posición promedio. La oleada se comprime en un grupo denso sin retroceso masivo. Potencia todo AoE.",
+desc_hook:"🟢. 73 fijo, 0.05/s. Fallo 90%−2.5%/mejora. +25✨ por acierto.",
+desc_rose:"Espinas máx 30, ×1.35. 45 daño, vel 4.6.",
+desc_snow:"Congelar ~25–65%. 53 daño.",
+desc_coco:"Fusión ✨×5.",
+desc_disco:"Luchador + aura +22.5%.",
+desc_clover:"Suerte +39% para 🟢.",
+desc_graph:"Fusión +1 rango (objetivo ≤niv×2). −30✨/20s. Inmóvil.",
+desc_battery:"+30–40% vel /4s.",
+desc_portal:"Devuelve al inicio hasta 45%. 📡+5%. +13% daño si adyacente a 📐.",
+desc_olive:"Enredaderas ×2.2, máx 9.",
+desc_salt:"53 daño, 3/s, círculos blancos. Cada 12s 30% (+5%/mejora) próximo golpe ralentiza monstruo 20s. Propio temporizador. No mejora con estrellas.",
+desc_vase:"Copia vel 100%, daño 75%−5%/niv. No mejora con estrellas. ⚫ bloqueo.",
+desc_anchor:"130/3, no mejora con estrellas. Cambia con inmóviles (excepto 🚉). 5% se mantiene. No con 🌠/♑.",
+desc_gift:"75% aleatorio.",
+desc_trans:"63%+5%/★ duplicar. −10✨/30s. Vel 1.5. PUEDE duplicar ♑.",
+desc_uran:"5–85✨, ahoga = da.",
+desc_plug:"✨×6.25 o ⚡.  cerca +22% vel.",
+desc_gem:"200/2.1, bloqueado por vecino. ⚫. Hace ×2.5 a 🎠.",
+desc_key:"7 → Unidad Especial. Tras Buratino desaparecen. Auto-borrado en niv 20.",
+desc_snake:"Fila +20%/serpiente. NO dispara si fila tiene algún 🟠 o 🟢. Vecino ≠🟢/serpiente → −60% vel. Inmóvil.",
+desc_cam:"25% 🎥10, sino reinicio.",
+desc_buratino:"Oculto. Crece solo 15s (75%/25% parar), máx 7.",
+desc_dino:"🦖 DINO (monstruo). Aparece desde niv 15. Mucha HP, lento. Recibe 100% daño de 🟠 Ataque y 80% de 🟡 Semi,  Apoyo,  Riesgo.",
+desc_carousel:"🎠 CARRUSEL (monstruo). Aparece desde niv 5. Como 👾 en HP/vel, pero recibe ×0.4 daño de todos excepto 🌸🪻♦️ (hacen ×2.5)."
+},
+fr:{
+subtitle:"Wave EXpansion URge",continue:"💾 Continuer",play:"▶️ Jouer",challenge:"🎲 Défi",duel:"👥 Duel",guide:"📖 Guide",compat:"⚠️ Synergie",records:"🏆 Records",mergeHint:"Fusion : mêmes rangs · une vie",
+compatTitle:"⚠️ Règles de Synergie",guideTitle:"📖 Guide",rankMinus:"rang−",rankPlus:"rang＋",starMinus:"★−",starPlus:"★＋",back:"⬅️ Retour",
+chooseTeam:"Choisir Équipe",selectHint:"Mêmes rangs pour fusionner ! 🎥 ne peut pas être premier. 🌠/♑ pas avec ⚓.",startBattle:"⚔️ Commencer",
+duelTitle:"👥 Duel",player1:"Joueur 1",player2:"Joueur 2",duelHint:"Touchez carte → emplacement actif. Les deux choisissent INDÉPENDAMMENT. 🌠/ pas avec ⚓.",random:"🎲 Aléatoire",goBattle:"⚔️ GO",swapPlayer:"🔄 Changer Joueur",activeP:"Actif : Joueur ",
+recordsTitle:"🏆 Records",tabNorm:"Normal",tabChal:"Défi",tabDuel:"Duels",empty:"Vide.",name:"Nom",color:"couleur",save:"💾 Sauver",
+blackout:"🎥 Caméra a bloqué l'accès pendant 30 secondes",confirmExit:"Êtes-vous sûr de vouloir quitter ?",yes:"Oui",no:"Non",think:"Je vais réfléchir...",thinkMsg:"D'accord, prends ton temps 😄",
+gameOver:"💀 Fin de Partie",breach:"Brèche !",youWin:"🏆 Vous avez gagné !",youLose:"💀 Vous avez perdu",draw:"🤝 MATCH NUL !",winner:"Gagnant : ",
+lvlUp:"Niveau ",host:"Hôte : ",guest:"Invité : ",opp:"Adversaire : ",preview:" aperçu",saved:"💾 Sauvé",
+atk:"ATTAQUE",semi:"SEMI",sup:"SOUTIEN",risk:"RISQUE",
+rights:"⚖️ Droits",rightsTitle:"⚖️ Droits et Paternité",rightsIntro:"WEXUR est le jeu original de Daniil Vasilievich Myagkov. L'avis de paternité ne doit pas être retiré. Le partage du fichier non modifié est permis. L'usage commercial et les dérivés exigent une permission écrite.",rightsLicense:"© 2026 Daniil Vasilievich Myagkov. Tous droits réservés.",author:"Auteur",version:"Version",sha:"SHA-256 config",closeResume:"▶️ Reprendre",errNoMerge:"❌ Ces unités ne fusionnent pas !",deckHint:"Jeu en pause. Fermez cette fenêtre pour continuer.",
+desc_sun:"Standard d'équilibre. 75% reste lui-même à la fusion. À côté de 🏵️ les deux +5% vit.",
+desc_donut:"Artillerie lourde. À ★4 : 35% étourdir ennemi 2s.",
+desc_astra:"Frappe cible aléatoire. À ★4 : 8% double dégât PAR tir. À côté de ♑ LES DEUX +20% dégâts. À côté de 🌻 +5% vit.",
+desc_cherry:"Double tir. 🌸 proche +2%. +13% dégâts si adjacent à 📐 ou 💠.",
+desc_grape:"AoE sur TOUS, SAUF boss 🐲.",
+desc_planet:"Frappe le dernier. Bloqué par 🟢.  proche +9%.",
+desc_diamond:"Combattant fiable. Inflige ×2.5 dégâts à 🎠 Carrousel.",
+desc_disc:"Roulette de fusion.",
+desc_maple:"7% +2 rangs. À côté de 🪱 +40%.",
+desc_juice:"Au niv 5 donne aux autres 🧃 +10% dégâts (cumulable).",
+desc_teddy:"87 dégâts, immobile, endort voisins. 45% reste lui-même.",
+desc_sakura:"Roses. +2% 🍒. Au niv 3 → génère 🍒 toutes les 25s. Inflige ×2.5 à 🎠.",
+desc_lion:"A tué le dernier → 30% +5✨.",
+desc_algae:"15/s, 4 dégâts. 8%/45s +1 rang. ⚽ +10%. ♑ proche +10%.",
+desc_pumpkin:"Fort, 20% reste lui-même. À côté de 🧋 +20% dégâts.",
+desc_tangerine:"Fusionne avec 🫖. 55% reste lui-même.",
+desc_ball:"Puissant, 1% zéro. ✳️ proche +10%.",
+desc_teapot:"Cadence moyenne rapide. Fusionne avec 🍊.",
+desc_radar:"1070 dégâts, 0.1/s. Bloqué par ⚫. Si un s'éteint, tous se taisent. 💠 proche +5%.",
+desc_fuel:"Pair ×3 vit, impair ÷3. 43% reste lui-même.",
+desc_plane:"Coin +13%. 🟡 proche −3%. Bouge après niv 10. Vit 4.5.",
+desc_sleepy:"Cycle 30s sommeil/30s actif. +5% dégâts par 🧃✳️🫒. +13% vit par 🛬. Immunisé à ⛄.",
+desc_candy:"3/17 spam. 60% reste lui-même.",
+desc_urn:"Travaille 45s, puis se tait. Sacrifice : glisser unité mobile 1 rang (35% +1 rang à l'urne) OU 🚉 (+35✨). 🟢 proche +7% vit. 🧋 proche +22% vit. 53% reste lui-même.",
+desc_bubble:"Frappe UNIQUEMENT 👻🦠. Cercles noirs. Vit 4.4. 🎃 proche +20% dégâts (une fois). ⚱️🛢️🔌 proche +22% vit (une fois).",
+desc_worm:"Frappe UNIQUEMENT 🦠🐲.  proche +40% (une fois). Toutes les 60s 5% génère 🍅 proche.",
+desc_tomato:"Caché. Frappe UNIQUEMENT 🐲. 300/30. Non sélectionnable.",
+desc_star:"31/1.6. ×2.5 dégâts si ADJACENT uniquement à 💠/ (ou personne) ; sinon ne tire pas. Vérification stricte par cellules adjacentes. Bouge dès niv 19. 5% reste lui-même. Pas avec ⚓.",
+desc_capri:"8/3.7. IMMOBILE. À côté de 🏵️ LES DEUX +20% dégâts. 📈 proche ×3 dégâts (cumulable). ✳️ proche +10%. Si amélioré dans les 60 dernières s → ×4 vit. NE TIRE PAS si ADJACENT à unité hors 📈️✳️ (ou autre ♑) — vérification stricte par cellules adjacentes. −12✨/35s par ♑. 37% reste lui-même. Pas avec ⚓. Peut fusionner avec 🔁.",
+desc_lilac:"6/8.5 spam. Inflige ×2.5 à 🎠.",
+desc_billiard:"155 dégâts, 3/s. MAIS : chaque niveau sans fusion/étoile divise dégâts par 3. Fusion/étoile réinitialise compteur.",
+desc_eagle:"Chaque mort par son projectile donne +3% dégâts de façon permanente. Affiché comme 🦅N. Max 4 sur le terrain. 25% reste lui-même à la fusion.",
+desc_can:"7 dégâts, 22/s. Frappe dernier aléatoire. 45% (+4%/amélioration) frappe DEUX aléatoires. 46% reste lui-même.",
+desc_hourglass:"21 dégâts, 4.3/s. Ralentit TOUS les monstres de 25% (non cumulable). À 3+ niv bloque tirs des voisins ADJACENTS. Immobile. −15✨/30s par sablier.",
+desc_lava:"Flaques 35%+5%/amélioration, 15%PV/s ×3, brûle 🌹/🛢️. 50% reste lui-même.",
+desc_eclipse:"Immobile. Zone sombre : −40% vit ennemis, +20% dégâts à eux, +15% alliés. 45% reste lui-même.",
+desc_kiwi:"Rapide 🟡, frappe celui du fond.",
+desc_barrel:"Max 2, écart 35%, ≤3.5s, rare. 111 dégâts, 1/s. 🧋 proche +22% vit.",
+desc_solar:"Rayon jusqu'à 53% PV. 18 dégâts. 🪐+9%.",
+desc_dog:"23.1/s. +15%/🦮 vit. +12% dégâts de 🌹. TIRE TOUJOURS (pas de pénalité de 🟢).",
+desc_yarn:"Balles traversent vague, frappent boss, explosent 🌹/🛢️. Vit 1.2.",
+desc_cloud:"Zone de pluie 8s, %PV. Vit 13.",
+desc_balloon:"Fusionne avec 🟢 et lui-même. 15% reste lui-même. Vit 9.8.",
+desc_triangle:"Puissant + pièges. 59% reste lui-même. Vit 1.2. +13% dégâts si adjacent à 💠.",
+desc_melon:"+30✨/niveau par 🍉. Vit 1.2.",
+desc_ext:"Brûlure ×1.5. Vit 2.8.",
+desc_fern:"Pousse seul avec le temps. 29 dégâts.",
+desc_heart:"×1.5–4.5 aux voisins. NE soigne PAS les ennemis.",
+desc_amur:"Soigne faiblement ennemis. Ward jusqu'à 4%.",
+desc_lady:"Repoussement sans dégâts. Vit 3.2. Chance croît de 0.7% à 12%.",
+desc_station:"55 dégâts, 2.6/s. IMMOBILE, ne fusionne pas, non échangeable par ⚓. 🟡 gauche/droite ×6 vit. Sacrifice ⚱️ +35✨.",
+desc_magnet:"Toutes les 8s réduit la dispersion de tous les monstres vivants à 45% autour de leur position moyenne. La vague se compresse en un bloc dense sans recul massif. Amplifie tout AoE.",
+desc_hook:"🟢. 73 fixe, 0.05/s. Raté 90%−2.5%/amélioration. +25✨ par coup.",
+desc_rose:"Épines max 30, ×1.35. 45 dégâts, vit 4.6.",
+desc_snow:"Gel ~25–65%. 53 dégâts.",
+desc_coco:"Fusion ✨×5.",
+desc_disco:"Combattant + aura +22.5%.",
+desc_clover:"Chance +39% pour 🟢.",
+desc_graph:"Fusion +1 rang (cible ≤niv×2). −30✨/20s. Immobile.",
+desc_battery:"+30–40% vit /4s.",
+desc_portal:"Retour au départ jusqu'à 45%. 📡+5%. +13% dégâts si adjacent à 📐.",
+desc_olive:"Lianes ×2.2, max 9.",
+desc_salt:"53 dégâts, 3/s, cercles blancs. Toutes les 12s 30% (+5%/amélioration) prochain coup ralentit monstre 20s. Propre minuteur. Non améliorable par étoiles.",
+desc_vase:"Copie vit 100%, dégâts 75%−5%/niv. Non améliorable par étoiles. ⚫ blocage.",
+desc_anchor:"130/3, non améliorable par étoiles. Échange avec immobiles (sauf 🚉). 5% reste lui-même. Pas avec 🌠/♑.",
+desc_gift:"75% aléatoire.",
+desc_trans:"63%+5%/★ dupliquer. −10✨/30s. Vit 1.5. PEUT dupliquer ♑.",
+desc_uran:"5–85✨, étouffe = donne.",
+desc_plug:"✨×6.25 ou ⚡.  proche +22% vit.",
+desc_gem:"200/2.1, bloqué par voisin. ⚫. Inflige ×2.5 à 🎠.",
+desc_key:"7 → Unité Spéciale. Après Buratino disparaissent. Auto-suppression niv 20.",
+desc_snake:"Ligne +20%/serpent. NE TIRE PAS si ligne a un 🟠 ou 🟢. Voisin ≠🟢/serpent → −60% vit. Immobile.",
+desc_cam:"25% 🎥10, sinon réinitialisation.",
+desc_buratino:"Caché. Pousse seul 15s (75%/25% arrêt), max 7.",
+desc_dino:"🦖 DINO (monstre). Apparaît dès niv 15. Énorme PV, lent. Prend 100% dégâts de 🟠 Attaque et 80% de 🟡 Semi,  Soutien,  Risque.",
+desc_carousel:"🎠 CARROUSEL (monstre). Apparaît dès niv 5. Comme 👾 en PV/vit, mais prend ×0.4 dégâts de tous sauf 🌸♦️ (infligent ×2.5)."
+},
+zh:{
+subtitle:"Wave EXpansion URge",continue:"💾 继续",play:"▶️ 开始",challenge:"🎲 挑战",duel:"👥 决斗",guide:"📖 指南",compat:"⚠️ 协同",records:"🏆 记录",mergeHint:"融合：相同等级 · 一条命",
+compatTitle:"⚠️ 协同规则",guideTitle:"📖 指南",rankMinus:"等级−",rankPlus:"等级＋",starMinus:"★−",starPlus:"★＋",back:"⬅️ 返回",
+chooseTeam:"选择队伍",selectHint:"相同等级才能融合！🎥不能第一个。🌠/不能与⚓一起。",startBattle:"⚔️ 开始战斗",
+duelTitle:"👥 决斗",player1:"玩家 1",player2:"玩家 2",duelHint:"点击卡牌放入槽位。双方独立选择。🌠/♑不能与⚓一起。",random:"🎲 随机",goBattle:"⚔️ 开始",swapPlayer:"🔄 切换玩家",activeP:"当前：玩家 ",
+recordsTitle:"🏆 记录",tabNorm:"普通",tabChal:"挑战",tabDuel:"决斗",empty:"空。",name:"名字",color:"颜色",save:"💾 保存",
+blackout:"🎥 摄像机阻挡了30秒",confirmExit:"确定要退出游戏吗？",yes:"是",no:"否",think:"我想想...",thinkMsg:"好吧，慢慢想 😄",
+gameOver:"💀 游戏结束",breach:"突破！",youWin:"🏆 你赢了！",youLose:"💀 你输了",draw:"🤝 平局！",winner:"胜者：",
+lvlUp:"等级 ",host:"房主：",guest:"访客：",opp:"对手：",preview:" 预览",saved:"💾 已保存",
+atk:"攻击",semi:"半辅助",sup:"支援",risk:"风险",
+rights:"⚖️ 权利",rightsTitle:"⚖️ 权利与作者",rightsIntro:"WEXUR 是 Daniil Vasilievich Myagkov 的原创游戏。不得删除作者声明。允许分享未修改文件。商业使用和衍生作品需书面许可。",rightsLicense:"© 2026 Daniil Vasilievich Myagkov。保留所有权利。",author:"作者",version:"版本",sha:"SHA-256 配置",closeResume:"▶️ 继续",errNoMerge:"❌ 这些单位无法融合！",deckHint:"游戏已暂停。关闭此窗口以继续。",
+desc_sun:"平衡标准。融合时75%保持自身。与🏵️相邻两者+5%速度。",
+desc_donut:"重型火炮。★4时：35%使敌人眩晕2秒。",
+desc_astra:"攻击随机目标。★4时：每次射击8%双倍伤害。与♑相邻两者+20%伤害。与🌻相邻+5%速度。",
+desc_cherry:"双重射击。🌸相邻+2%。若与📐或💠相邻+13%伤害。",
+desc_grape:"对所有人造成AoE伤害，除了Boss🐲。",
+desc_planet:"攻击最后一名。被🟢阻挡。相邻+9%。",
+desc_diamond:"可靠的战士。对🎠旋转木马造成×2.5伤害。",
+desc_disc:"融合轮盘赌。",
+desc_maple:"7%几率+2等级。与🪱相邻+40%。",
+desc_juice:"5级时给其他🧃+10%伤害（可叠加）。",
+desc_teddy:"87伤害，不可移动，催眠邻居。45%保持自身。",
+desc_sakura:"粉色系。+2%🍒。3级时每25秒生成🍒。对🎠造成×2.5伤害。",
+desc_lion:"击杀最后一个→30%几率+5✨。",
+desc_algae:"15/秒，4伤害。8%/45秒+1等级。⚽+10%。♑相邻+10%。",
+desc_pumpkin:"强力，20%保持自身。与🧋相邻+20%伤害。",
+desc_tangerine:"与🫖融合。55%保持自身。",
+desc_ball:"强力，1%几率为0。✳️相邻+10%。",
+desc_teapot:"射速中等偏快。与🍊融合。",
+desc_radar:"1070伤害，0.1/秒。被⚫阻挡。一个关闭则全部沉默。💠相邻+5%。",
+desc_fuel:"偶数×3速度，奇数÷3。43%保持自身。",
+desc_plane:"角落+13%。🟡相邻−3%。10级后移动。速度4.5。",
+desc_sleepy:"30秒睡眠/30秒活跃循环。每个🧃✳️🫒+5%伤害。每个🛬+13%速度。免疫⛄。",
+desc_candy:"3/17连发。60%保持自身。",
+desc_urn:"工作45秒后沉默。献祭：拖动1级移动单位（35%给瓮+1级）或🚉（+35✨）。🟢相邻+7%速度。🧋相邻+22%速度。53%保持自身。",
+desc_bubble:"只攻击👻🦠🚁。黑圈。速度4.4。🎃相邻+20%伤害（一次）。⚱️🛢️🔌相邻+22%速度（一次）。",
+desc_worm:"只攻击🦠。🍁相邻+40%（一次）。每60秒5%在附近生成🍅。",
+desc_tomato:"隐藏。只攻击🐲。300/30。不可选择。",
+desc_star:"31/1.6。如果仅与💠/相邻（或不相邻）→×2.5伤害。否则不射击。严格按相邻格子检查。19级起移动。5%保持自身。不能与⚓一起。",
+desc_capri:"8/3.7。不可移动。与🏵️相邻两者+20%伤害。📈相邻×3伤害（叠加）。✳️相邻+10%。如果在过去60秒内升级过→×4速度。如果与📈️✳️以外的单位相邻（或另一个♑）则不射击——严格按相邻格子检查。每个♑−12✨/35秒。37%保持自身。不能与⚓一起。可与🔁融合。",
+desc_lilac:"6/8.5连发。对🎠造成×2.5伤害。",
+desc_billiard:"155伤害，3/秒。但：每升一级且未融合/升星，伤害除以3。融合/升星重置计数器。",
+desc_eagle:"其弹丸造成的每次击杀永久增加+3%伤害。显示为🦅N。场上最多4个。融合时25%保持自身。",
+desc_can:"7伤害，22/秒。攻击随机的最后一名。45%（+4%/升级）几率攻击两个随机目标。46%保持自身。",
+desc_hourglass:"21伤害，4.3/秒。使所有怪物减速25%（不叠加）。3级以上阻止相邻邻居射击。不可移动。每个沙漏−15✨/30秒。",
+desc_lava:"水坑35%+5%/升级，15%生命/秒×3，燃烧🌹/🛢️。50%保持自身。",
+desc_eclipse:"不可移动。黑暗区域：敌人−40%速度，对其+20%伤害，友军+15%。45%保持自身。",
+desc_kiwi:"快速🟡，攻击最后一名。",
+desc_barrel:"最多2个，间距35%，≤3.5秒，稀有。111伤害，1/秒。🧋相邻+22%速度。",
+desc_solar:"光束最高53%生命。18伤害。🪐+9%。",
+desc_dog:"23.1/秒。每个🦮+15%速度。🌹提供+12%伤害。始终射击（无🟢惩罚）。",
+desc_yarn:"球穿透波次，击中Boss，引爆🌹/🛢️。速度1.2。",
+desc_cloud:"雨区8秒，%生命。速度13。",
+desc_balloon:"与🟢及自身融合。15%保持自身。速度9.8。",
+desc_triangle:"强力+陷阱。59%保持自身。速度1.2。若与💠相邻+13%伤害。",
+desc_melon:"每个🍉每级+30✨。速度1.2。",
+desc_ext:"燃烧×1.5。速度2.8。",
+desc_fern:"随时间自我生长。29伤害。",
+desc_heart:"对邻居×1.5–4.5。不治疗敌人。",
+desc_amur:"微弱治疗敌人。结界最高4%。",
+desc_lady:"击退无伤害。速度3.2。击退几率从0.7%升至12%。",
+desc_station:"55伤害，2.6/秒。不可移动，不可融合，不被⚓交换。左右🟡×6速度。献祭⚱️+35✨。",
+desc_magnet:"每8秒将所有存活怪物的散布范围缩小到平均位置周围的45%。波次压缩成密集的一团，不会大规模退回起点/终点。增强所有AoE。",
+desc_hook:"🟢。固定73，0.05/秒。未命中90%−2.5%/升级。命中+25✨。",
+desc_rose:"尖刺最多30，×1.35。45伤害，速度4.6。",
+desc_snow:"冻结~25–65%。53伤害。",
+desc_coco:"融合✨×5。",
+desc_disco:"战士+光环+22.5%。",
+desc_clover:"为🟢增加39%运气。",
+desc_graph:"融合+1等级（目标≤等级×2）。−30✨/20秒。不可移动。",
+desc_battery:"+30–40%速度/4秒。",
+desc_portal:"送回起点最高45%。📡+5%。若与📐相邻+13%伤害。",
+desc_olive:"藤蔓×2.2，最多9。",
+desc_salt:"53伤害，3/秒，白圈。每12秒30%（+5%/升级）几率下次命中减速怪物20秒。独立计时器。不能用星星升级。",
+desc_vase:"复制速度100%，伤害75%−5%/级。不能用星星升级。⚫阻挡。",
+desc_anchor:"130/3，不能用星星升级。与不可移动单位交换（除🚉）。5%保持自身。不能与🌠/♑一起。",
+desc_gift:"75%随机。",
+desc_trans:"63%+5%/★复制。−10✨/30秒。速度1.5。可以复制♑。",
+desc_uran:"5–85✨，窒息=给予。",
+desc_plug:"✨×6.25或⚡。相邻+22%速度。",
+desc_gem:"200/2.1，有邻居时被阻挡。⚫。对🎠造成×2.5伤害。",
+desc_key:"7个→特殊单位。出现布偶后钥匙消失。20级自动删除。",
+desc_snake:"行内每条蛇+20%。如果行内有🟠或🟢则不射击。邻居≠🟢/蛇→−60%速度。不可移动。",
+desc_cam:"25%🎥10，否则重置。",
+desc_buratino:"隐藏。自我生长15秒（75%/25%停止），上限7。",
+desc_dino:"🦖恐龙（怪物）。15级起出现。极高血量，缓慢。受到🟠攻击100%伤害，受到🟡半辅助、🟢支援、风险80%伤害。",
+desc_carousel:"🎠旋转木马（怪物）。5级起出现。血量/速度与👾相同，但受到除🌸🪻♦️外所有伤害×0.4（它们造成×2.5）。"
+}
+};
+function t(key){ return L[currentLang][key] || L['en'][key] || key; }
+function applyLang(){
+document.querySelectorAll('[data-i18n]').forEach(el=>{ const k=el.getAttribute('data-i18n'); if(L[currentLang][k]) el.textContent=L[currentLang][k]; });
+document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ const k=el.getAttribute('data-i18n-ph'); if(L[currentLang][k]) el.placeholder=L[currentLang][k]; });
+$('btnLang').textContent='🌐 '+currentLang.toUpperCase();
+localStorage.setItem('wexur_lang',currentLang);
+refreshSelect(); updDualUI(); renderRecTabs(); renderRecords();
+if(state==='guide') renderGuide();
+if(state==='rules') renderRules();
+if(state==='rights') renderRights();
+if(!$('deckInfo').classList.contains('hidden')){$('btnDeckClose').textContent=t('closeResume');$('dkInfoBody').lastElementChild&&($('dkHintLine').textContent=t('deckHint'));}
+}
+$('btnLang').onclick=()=>{ let idx=LANGS.indexOf(currentLang); currentLang=LANGS[(idx+1)%LANGS.length]; applyLang(); };
+// =============================================================
+function toast(t){$('toastTxt').textContent=t;$('toast').style.display='flex'}$('toastX').onclick=()=>$('toast').style.display='none';
+const fmtTime=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+const GM={atk:{label:'atk',col:'#ff8f3d'},semi:{label:'semi',col:'#ffd93d'},sup:{label:'sup',col:'#7ed957'},risk:{label:'risk',col:'#c789ff'}};
+const badge=g=>`<span class="tb" style="background:${GM[g].col}">${t(GM[g].label)}</span>`;
+const CHARS={
+sun:{e:'🌻',cls:'atk',grp:'atk',n:'Sunflower',dmg:10,rate:5,col:'#ffd93d',ab:'desc_sun'},
+donut:{e:'🥯',cls:'atk',grp:'atk',n:'Donut',dmg:205,rate:0.3,col:'#d9a066',ab:'desc_donut'},
+astra:{e:'🏵️',cls:'atk',grp:'atk',n:'Aster',dmg:14,rate:4.5,col:'#ff9a3d',ab:'desc_astra'},
+cherry:{e:'🍒',cls:'atk',grp:'atk',n:'Cherry',dmg:6,rate:4.5,col:'#ff3b5c',ab:'desc_cherry'},
+grape:{e:'🍇',cls:'atk',grp:'atk',n:'Grape',dmg:6,rate:1.6,col:'#b06df5',ab:'desc_grape'},
+planet:{e:'🪐',cls:'atk',grp:'atk',n:'Planet',dmg:12,rate:6.5,col:'#9a5cff',ab:'desc_planet'},
+diamond:{e:'♦️',cls:'atk',grp:'atk',n:'Diamond',dmg:23,rate:2.3,col:'#ff4d4d',ab:'desc_diamond'},
+disc:{e:'💿',cls:'atk',grp:'atk',n:'Disc',dmg:20,rate:2.1,col:'#c0c0ff',ab:'desc_disc'},
+maple:{e:'🍁',cls:'atk',grp:'atk',n:'Maple',dmg:14,rate:3.1,col:'#ff7f2a',ab:'desc_maple'},
+juice:{e:'🧃',cls:'atk',grp:'atk',n:'Juice',dmg:30,rate:1.7,col:'#7ed957',ab:'desc_juice'},
+teddy:{e:'🧸',cls:'atk',grp:'atk',n:'Teddy',dmg:87,rate:0.7,col:'#a0663a',ab:'desc_teddy'},
+sakura:{e:'🌸',cls:'atk',grp:'atk',n:'Sakura',dmg:20,rate:2.5,col:'#ffb7d0',ab:'desc_sakura'},
+lion:{e:'♌',cls:'atk',grp:'atk',n:'Lion',dmg:34,rate:1.4,col:'#ffee33',ab:'desc_lion'},
+algae:{e:'✳️',cls:'atk',grp:'atk',n:'Algae',dmg:4,rate:15,col:'#7ed957',ab:'desc_algae'},
+pumpkin:{e:'🎃',cls:'atk',grp:'atk',n:'Pumpkin',dmg:83,rate:0.9,col:'#ff7f2a',ab:'desc_pumpkin'},
+tangerine:{e:'🍊',cls:'atk',grp:'atk',n:'Tangerine',dmg:32,rate:1.6,col:'#ff8c00',ab:'desc_tangerine'},
+ball:{e:'⚽',cls:'atk',grp:'atk',n:'Ball',dmg:88,rate:0.7,col:'#ffffff',ab:'desc_ball'},
+teapot:{e:'🫖',cls:'atk',grp:'atk',n:'Teapot',dmg:13,rate:3.6,col:'#d0b080',ab:'desc_teapot'},
+radar:{e:'📡',cls:'atk',grp:'atk',n:'Radar',dmg:1070,rate:0.1,col:'#7fffd4',ab:'desc_radar'},
+fuel:{e:'⛽',cls:'atk',grp:'atk',n:'Fuel',dmg:29,rate:1.7,col:'#ff8f3d',ab:'desc_fuel'},
+plane:{e:'🛬',cls:'atk',grp:'atk',n:'Airport',dmg:17,rate:4.5,col:'#ff8f3d',ab:'desc_plane'},
+sleepy:{e:'💤',cls:'atk',grp:'atk',n:'Sleepy',dmg:16,rate:13.1,col:'#aaaaff',ab:'desc_sleepy'},
+candy:{e:'🍬',cls:'atk',grp:'atk',n:'Candy',dmg:3,rate:17,col:'#ff9ad5',ab:'desc_candy'},
+urn:{e:'⚱️',cls:'atk',grp:'atk',n:'Urn',dmg:12,rate:7.2,col:'#c9a066',ab:'desc_urn'},
+bubble:{e:'🧋',cls:'atk',grp:'atk',n:'Bubble Tea',dmg:38,rate:4.4,col:'#111111',ab:'desc_bubble'},
+worm:{e:'🪱',cls:'atk',grp:'atk',n:'Worm',dmg:9,rate:25,col:'#ff8ab5',ab:'desc_worm'},
+tomato:{e:'🍅',cls:'atk',grp:'atk',n:'Tomato',dmg:300,rate:30,col:'#ff6347',ab:'desc_tomato',hidden:true},
+star:{e:'🌠',cls:'atk',grp:'atk',n:'Star',dmg:31,rate:1.6,col:'#fff700',ab:'desc_star'},
+capri:{e:'♑',cls:'atk',grp:'atk',n:'Capricorn',dmg:8,rate:3.7,col:'#cccc00',ab:'desc_capri'},
+lilac:{e:'🪻',cls:'atk',grp:'atk',n:'Lilac',dmg:6,rate:8.5,col:'#b06df5',ab:'desc_lilac'},
+billiard:{e:'🎱',cls:'atk',grp:'atk',n:'Billiard',dmg:155,rate:3,col:'#222222',ab:'desc_billiard'},
+eagle:{e:'🦅',cls:'atk',grp:'atk',n:'Eagle',dmg:8,rate:1.2,col:'#a67c00',ab:'desc_eagle'},
+can:{e:'🥫',cls:'semi',grp:'semi',n:'Can',dmg:7,rate:22,col:'#c0c0c0',ab:'desc_can'},
+hourglass:{e:'⏳',cls:'semi',grp:'semi',n:'Hourglass',dmg:21,rate:4.3,col:'#ffd93d',ab:'desc_hourglass'},
+lava:{e:'🌋',cls:'semi',grp:'semi',n:'Lava',dmg:45,rate:1.2,col:'#ff4500',ab:'desc_lava'},
+eclipse:{e:'🌑',cls:'semi',grp:'semi',n:'Eclipse',dmg:63,rate:2.1,col:'#4a0080',ab:'desc_eclipse'},
+kiwi:{e:'🥝',cls:'semi',grp:'semi',n:'Kiwi',dmg:22,rate:7.1,col:'#7ed957',ab:'desc_kiwi'},
+barrel:{e:'🛢️',cls:'semi',grp:'semi',n:'Barrel',dmg:111,rate:1,col:'#5ab8ff',ab:'desc_barrel'},
+solar:{e:'🔆',cls:'semi',grp:'semi',n:'Solar',dmg:18,rate:3.8,col:'#ff5da0',ab:'desc_solar'},
+dog:{e:'🦮',cls:'semi',grp:'semi',n:'Dog',dmg:4,rate:23.1,col:'#ffffff',ab:'desc_dog'},
+yarn:{e:'🧶',cls:'semi',grp:'semi',n:'Yarn',dmg:87,rate:1.2,col:'#ff6fa5',ab:'desc_yarn'},
+cloud:{e:'🌧️',cls:'semi',grp:'semi',n:'Cloud',dmg:8,rate:13,col:'#9fb7d6',ab:'desc_cloud'},
+balloon:{e:'🎈',cls:'semi',grp:'semi',n:'Balloon',dmg:15,rate:9.8,col:'#ff8ab5',ab:'desc_balloon'},
+triangle:{e:'📐',cls:'semi',grp:'semi',n:'Triangle',dmg:163,rate:1.2,col:'#f5f580',ab:'desc_triangle'},
+melon:{e:'🍉',cls:'semi',grp:'semi',n:'Melon',dmg:80,rate:1.2,col:'#58e08a',ab:'desc_melon'},
+ext:{e:'🧯',cls:'semi',grp:'semi',n:'Extinguisher',dmg:37,rate:2.8,col:'#ff6b4d',ab:'desc_ext'},
+fern:{e:'🪴',cls:'semi',grp:'semi',n:'Fern',dmg:29,rate:2.4,col:'#7ed957',ab:'desc_fern'},
+heart:{e:'🫀',cls:'semi',grp:'semi',n:'Heart',dmg:16,rate:2.3,col:'#ff5d7a',ab:'desc_heart'},
+amur:{e:'💟',cls:'semi',grp:'semi',n:'Amur',dmg:10,rate:6,col:'#ff9ad5',ab:'desc_amur'},
+lady:{e:'👠',cls:'semi',grp:'semi',n:'Lady',dmg:0,rate:3.2,col:'#ff77c8',ab:'desc_lady'},
+station:{e:'🚉',cls:'semi',grp:'semi',n:'Station',dmg:55,rate:2.6,col:'#8899aa',ab:'desc_station'},
+magnet:{e:'🧲',cls:'semi',grp:'semi',n:'Magnet',dmg:14,rate:2.0,col:'#ff5da0',ab:'desc_magnet'},
+hook:{e:'🪝',cls:'sup',grp:'sup',n:'Hook',dmg:73,rate:0.05,col:'#ffd23f',ab:'desc_hook'},
+rose:{e:'🌹',cls:'sup',grp:'sup',n:'Rose',dmg:45,rate:4.6,col:'#ff5d7a',ab:'desc_rose'},
+snow:{e:'❄️',cls:'sup',grp:'sup',n:'Snow',dmg:53,rate:3,col:'#7fd4ff',ab:'desc_snow'},
+coco:{e:'🥥',cls:'sup',grp:'sup',n:'Coconut',dmg:1,rate:0.5,col:'#c789ff',ab:'desc_coco'},
+disco:{e:'🪩',cls:'sup',grp:'sup',n:'Disco Ball',dmg:63,rate:4.3,col:'#9adcff',ab:'desc_disco'},
+clover:{e:'🍀',cls:'sup',grp:'sup',n:'Clover',dmg:1,rate:0.3,col:'#58e08a',ab:'desc_clover'},
+graph:{e:'📈',cls:'sup',grp:'sup',n:'Graph',dmg:2,rate:0.4,col:'#7ef59b',ab:'desc_graph'},
+battery:{e:'🔋',cls:'sup',grp:'sup',n:'Battery',dmg:1,rate:0.3,col:'#b8ff5a',ab:'desc_battery'},
+portal:{e:'💠',cls:'sup',grp:'sup',n:'Portal',dmg:1,rate:0.2,col:'#66e0ff',ab:'desc_portal'},
+olive:{e:'🫒',cls:'sup',grp:'sup',n:'Olive',dmg:45,rate:3.1,col:'#9acd5a',ab:'desc_olive'},
+salt:{e:'🧂',cls:'sup',grp:'sup',n:'Salt',dmg:53,rate:3,col:'#ffffff',ab:'desc_salt'},
+vase:{e:'🏺',cls:'sup',grp:'sup',n:'Vase',dmg:0,rate:0,col:'#d9a066',ab:'desc_vase'},
+anchor:{e:'⚓',cls:'sup',grp:'sup',n:'Anchor',dmg:130,rate:3,col:'#7a8cff',ab:'desc_anchor'},
+gift:{e:'🎁',cls:'sup',grp:'sup',n:'Gift',dmg:5,rate:0.17,col:'#ff9ad5',ab:'desc_gift'},
+trans:{e:'🔁',cls:'trans',grp:'risk',n:'Translator',dmg:13,rate:1.5,col:'#ffbf00',ab:'desc_trans'},
+uran:{e:'☢️',cls:'atk',grp:'risk',n:'Uranium',dmg:92,rate:0.1,col:'#9dff5a',ab:'desc_uran'},
+plug:{e:'🔌',cls:'sup',grp:'risk',n:'Plug',dmg:1,rate:0.7,col:'#ffe14d',ab:'desc_plug'},
+gem:{e:'💎',cls:'atk',grp:'risk',n:'Gem',dmg:200,rate:2.1,col:'#66e0ff',ab:'desc_gem'},
+key:{e:'🗝️',cls:'atk',grp:'risk',n:'Key',dmg:8,rate:1.2,col:'#ffd23f',ab:'desc_key'},
+snake:{e:'🐍',cls:'atk',grp:'risk',n:'Snake',dmg:30,rate:1.8,col:'#ff3b3c',ab:'desc_snake'},
+cam:{e:'🎥',cls:'cam',grp:'risk',n:'Camera',dmg:3,rate:1.1,col:'#cccccc',ab:'desc_cam'},
+buratino:{e:'🪵',cls:'atk',grp:'atk',n:'Buratino',dmg:60,rate:1.9,col:'#d9a066',ab:'desc_buratino',hidden:true}};
+const GROUP_ORDER=['atk','semi','sup','risk'];
+const ORDER=Object.keys(CHARS).slice().sort((a,b)=>GROUP_ORDER.indexOf(CHARS[a].grp)-GROUP_ORDER.indexOf(CHARS[b].grp));
+const visible=ORDER.filter(k=>!CHARS[k].hidden);
+const UPG_COST=[60,150,350,600],UPG_MULT=[2,3,3,4];
+const IMMOVABLE_BASE=['disco','uran','cam','dog','fern','heart','amur','teddy','graph','eclipse','snake','station','hourglass','capri'];
+function isImm(k,u){if(IMMOVABLE_BASE.includes(k))return true;if(k==='plane')return !(u&&u.level>=10);if(k==='star')return !(u&&u.level>=19);return false}
+function multOf(u){let m=1;for(let i=0;i<u.tier;i++)m*=UPG_MULT[i];return m}
+const lvlRate=l=>l<=1?1:1+(l-1)*1.1;const nbOf=i=>[i-5,i+5,(i%5)>0?i-1:-1,(i%5)<4?i+1:-1];
+const heartMultOf=l=>{const T=[0,1.5,2,2.5,3,3.5,4,4.5];return l<=7?T[l]:4.5+0.5*(l-7)};
+const uranIncome=u=>Math.min(85,5+10*(u.level-1)+10*u.tier);
+function sakuraBoost(F,u){if(u.cell<0)return 1;let n=0;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='sakura')n++}return 1+0.02*n}
+function anyNb(F,u){if(u.cell<0)return false;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;if(F.cells[j])return true}return false}
+function auraOf(F,u){if(u.cell==null||u.cell<0)return 0;let a=0;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='disco')a+=0.225+0.03*(v.tier+(v.level-1));if(v&&v.key==='uran')a-=uranIncome(v)/100}return a}
+function luckOf(F,u){let s=0;for(const v of F.cells)if(v&&v.key==='clover'&&v!==u)s+=0.39+0.05*(v.tier+(v.level-1));return s}
+function heartBoost(F,u){if(u.cell<0)return 1;let m=1;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='heart')m*=heartMultOf(v.level)}return m}
+function planetMod(F,u){if(u.cell==null||u.cell<0)return{dis:false,m:1};let dis=false,m=1;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(!v)continue;const g=CHARS[v.key].grp;if(g==='sup')dis=true;else if(g==='semi'&&v.key==='solar')m*=1.09}return{dis,m}}
+function dogMod(F,u){if(u.cell==null||u.cell<0)return{dis:false,m:1,dm:1};let r=0,d=0;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(!v)continue;if(v.key==='dog')r+=0.15;else if(v.key==='rose')d+=0.12}return{dis:false,m:1+r,dm:1+d}}
+function vaseAdj(F,u){if(u.cell<0)return false;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='vase')return true}return false}
+function vasePct(u){return Math.max(0.20,0.75-0.05*(u.level-1))}
+function vasePick(F,u){if(u.cell<0)return null;let best=null,bd=-1;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(!v||v.key==='vase')continue;const g=CHARS[v.key].grp;if(g!=='atk'&&g!=='semi')continue;const dps=unitDmg(F,v)*unitRate(F,v);if(dps>bd){bd=dps;best=v}}return best}
+const riskOnField=F=>F.cells.some(v=>v&&CHARS[v.key].grp==='risk');const camOnField=F=>F.cells.some(v=>v&&v.key==='cam');
+function fuelCount(F){let n=0;for(const v of F.cells)if(v&&v.key==='fuel')n++;return n}
+function algaeBallBoost(F,u){if(u.key!=='ball'||u.cell<0)return 1;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='algae')return 1.1}return 1}
+function astraSunRate(F,u){if(u.cell<0)return 1;if(u.key==='astra'||u.key==='sun'){for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&((u.key==='astra'&&v.key==='sun')||(u.key==='sun'&&v.key==='astra')))return 1.05}}return 1}
+function astraCapriBoost(F,u){if(u.cell<0||u.key!=='astra'&&u.key!=='capri')return 1;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&((u.key==='astra'&&v.key==='capri')||(u.key==='capri'&&v.key==='astra')))return 1.20}return 1}
+function cherryBoost(F,u){if(u.key!=='cherry'||u.cell<0)return 1;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&(v.key==='triangle'||v.key==='portal'))return 1.13}return 1}
+function pairBoost(F,u){if(u.cell<0)return 1;if(u.key==='triangle'){for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='portal')return 1.13}}if(u.key==='portal'){for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='triangle')return 1.13}}return 1}
+function juiceDmgBonus(F,u){if(u.key!=='juice')return 1;let b=0;for(const v of F.cells)if(v&&v.key==='juice'&&v!==u&&v.level>=5)b+=0.10;return 1+b}
+function sleepyDmg(F,u){if(u.key!=='sleepy'||u.cell<0)return 1;let m=1;const fr=['juice','algae','maple','olive'];for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&fr.includes(v.key))m+=0.05}return m}
+function sleepyRate(F,u){if(u.key!=='sleepy'||u.cell<0)return 1;let m=1;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='plane')m+=0.13}return m}
+function planeDmg(F,u){if(u.key!=='plane'||u.cell<0)return 1;let m=1;const c=u.cell;if(c===0||c===4||c===15||c===19)m*=1.13;for(const j of nbOf(c)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&CHARS[v.key].grp==='semi')m*=0.97}return m}
+function urnRate(F,u){if(u.key!=='urn'||u.cell<0)return 1;let m=1;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&CHARS[v.key].grp==='sup')m+=0.07}return m}
+function rowHasAtkSup(F,u){if(u.cell<0)return false;const row=Math.floor(u.cell/5);for(let c=row*5;c<row*5+5;c++){const v=F.cells[c];if(v&&v!==u&&(CHARS[v.key].grp==='atk'||CHARS[v.key].grp==='sup'))return true}return false}
+function stationSide(F,u){if(u.cell<0)return false;const c=u.cell,row=Math.floor(c/5);const L=c-1>=row*5?F.cells[c-1]:null,R=c+1<(row+1)*5?F.cells[c+1]:null;return !!((L&&L.key==='station')||(R&&R.key==='station'))}
+function bubbleAdj(F,u){if(u.cell<0)return false;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='bubble')return true}return false}
+function wormAdj(F,u){if(u.cell<0)return false;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='worm')return true}return false}
+function capriAdj(F,u){if(u.cell<0)return false;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='capri')return true}return false}
+function graphAdjCount(F,u){if(u.cell<0)return 0;let n=0;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='graph')n++}return n}
+function starOk(F,u){if(u.cell<0)return false;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key!=='portal'&&v.key!=='station')return false}return true}
+function capriOk(F,u){if(u.cell<0)return false;const allow=['graph','station','coco','astra','algae'];for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&!allow.includes(v.key))return false}return true}
+function pickType(F,types){let b=null;for(const m of F.monsters)if(!m.dead&&types.includes(m.type)&&(!b||m.d>b.d))b=m;return b}
+function canMultiChance(u){return Math.min(0.95,0.45+0.04*((u.level-1)+u.tier))}
+function saltSlowChance(u){return Math.min(0.95,0.30+0.05*((u.level-1)+u.tier))}
+function hourglassBlocks(F,u){if(u.cell<0||u.level<3)return false;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v!==u)return true}return false}
+function billiardDecay(u){return u.billiardNoMerge?Math.pow(1/3,u.level-1):1}
+function snakeRow(F,u){if(u.cell<0)return 1;const row=Math.floor(u.cell/5);let l=u.cell,r=u.cell;while(l-1>=row*5&&F.cells[l-1]&&F.cells[l-1].key==='snake')l--;while(r+1<(row*5+5)&&F.cells[r+1]&&F.cells[r+1].key==='snake')r++;return r-l+1}
+function snakeDmg(F,u){if(u.key!=='snake'||u.cell<0)return 1;return 1+0.20*(snakeRow(F,u)-1)}
+function snakeRate(F,u){if(u.key!=='snake'||u.cell<0)return 1;const c=u.cell,row=Math.floor(c/5);const left=c-1>=row*5?F.cells[c-1]:null,right=c+1<(row+1)*5?F.cells[c+1]:null;for(const v of [left,right])if(v&&v.key!=='snake'&&CHARS[v.key].grp!=='sup')return 0.40;return 1}
+function anyRadarDisabled(F){return F.cells.some(v=>v&&v.key==='radar'&&(v.stun>0||v.snowStun>0))}
+function snowFreeze(F){let cnt=0;for(const v of F.cells)if(v&&v.snowStun>0)cnt++;if(cnt>=5)return;const cand=[];for(const v of F.cells){if(!v||v.snowStun>0)continue;const c=CHARS[v.key];if(c.grp==='semi'||v.key==='algae'||v.key==='radar'||v.key==='sleepy')continue;cand.push(v)}if(!cand.length)return;const v=cand[Math.floor(Math.random()*cand.length)];v.snowStun=5;const p=cellPos(v.cell);floatAt(F,p.x,p.y,'⛄❄️','#7fd4ff')}
+const yarnBallDmg=(F,u)=>Math.round(87*(1+0.35*(u.level-1))*(1+0.25*u.tier)*Math.sqrt(F.monHp/300));
+const cloudDps=(F,u)=>Math.round(F.monHp*0.225*u.level*(1+0.25*u.tier));
+const rayDmg=(F,u)=>Math.round(F.monHp * Math.min(0.53, 0.32 + 0.03*(u.level-1) + 0.045*u.tier));
+const spikeDmg=(F,u)=>Math.round(94*u.level*(1+0.25*u.tier)*Math.sqrt(F.monHp/300));
+const triTrapDmg=(F,u)=>Math.round(300*Math.pow(1.5,u.level-1)*(1+0.5*u.tier)*Math.sqrt(F.monHp/300));
+const MAX_BARRELS=2;const BARREL_HOLD=u=>Math.min(3.5,2.2+0.2*(u.level-1)+0.5*u.tier);const barrelChewDps=F=>120*(1+0.04*(F.level-1));
+const CHEW_MULT={n:1,f:0.8,t:2,b:6,a:1.2,v:0.9,w:1.2,h:0.6,fox:0.8,pig:0.7,dino:0.5,carousel:1};
+const barrelHpOf=(F,u)=>Math.round(barrelChewDps(F)*BARREL_HOLD(u));const BARREL_MAX_DIST_RATIO=0.40;const BARREL_GAP_RATIO=0.35;
+const extBps=u=>12*(1+0.6*(u.level-1))*(1+0.3*u.tier);const freezeDur=u=>Math.min(5,2.8+0.25*(u.tier+(u.level-1)));
+const cocoBonus=(a,b)=>Math.round(350*(1+0.1*((a.level+b.level)-2)+0.2*(a.tier+b.tier)));
+const plugBonus=(a,b)=>Math.round(562*(1+0.1*((a.level+b.level)-2)+0.2*(a.tier+b.tier)));
+function portalChance(F,u){let ch=Math.min(0.45,0.07+0.025*Math.min(5,F.totalKills)+0.015*(u.tier+(u.level-1)));let adj=false;if(u.cell>=0)for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='radar')adj=true}if(adj)ch+=0.05;return Math.min(0.50,ch)}
+const battPct=u=>Math.min(40,30+3*(u.tier+(u.level-1)));const fernGrowInterval=u=>Math.max(8,25-2*(u.tier+(u.level-1)));
+const amurWard=u=>Math.min(0.04,0.012+0.006*(u.tier+(u.level-1)));const amurHeal=(F,u)=>Math.round(3*(1+0.3*(u.level-1))*multOf(u));
+const ladyChance=u=>Math.min(0.12,0.007+0.01*(u.tier+(u.level-1)));
+function stayP(k){return k==='sun'?0.75:k==='astra'?0.4:k==='pumpkin'?0.2:k==='tangerine'?0.55:k==='gift'?0.25:k==='anchor'?0.05:k==='melon'?0.3:k==='ext'?0.53:k==='lady'?0.5:k==='triangle'?0.59:k==='teddy'?0.45:k==='fuel'?0.43:k==='balloon'?0.15:k==='candy'?0.6:k==='lava'?0.5:k==='eclipse'?0.45:k==='urn'?0.53:k==='star'?0.05:k==='capri'?0.37:k==='can'?0.46:k==='billiard'?0.5:k==='eagle'?0.25:0.5}
+function lavaTrailChance(u){return Math.min(0.75,0.35+0.05*((u.level-1)+u.tier))}
+const BAL={monHpFor:l=>{if(l<=5)return Math.round(500*Math.pow(1.18,l-1)+120*(l-1));const base=Math.round(500*Math.pow(1.18,4)+120*4);return Math.round(base*Math.pow(1.22,l-5)+150*(l-5));},monSpd:l=>{if(l<=5)return Math.min(120,45+(l-1)*5);return Math.min(140,70+(l-5)*5);},spawnInt:l=>{if(l<=5)return Math.max(0.7,1.5*Math.pow(0.97,l-1));return Math.max(0.35,0.65*Math.pow(0.96,l-5));},killReward:25,levelBonus:25,summonStart:5,summonStep:10,cells:20,cols:5,projSpeed:520,startSparkles:60};
+const waveSize=l=>Math.min(36,20+2*Math.floor((l-1)/3));
+const MT={n:{e:'👾',s:26,bw:32},f:{e:'👻',s:24,bw:32},t:{e:'👹',s:30,bw:38},b:{e:'🐲',s:40,bw:48},a:{e:'👽',s:28,bw:34},v:{e:'🦠',s:24,bw:30},w:{e:'⛄',s:30,bw:38},h:{e:'🚁',s:20,bw:26},fox:{e:'🦊',s:26,bw:32},pig:{e:'🐷',s:32,bw:40},dino:{e:'🦖',s:38,bw:46},carousel:{e:'🎠',s:28,bw:34}};
+const MONSTER_POOL={low:['n','f'],mid:['n','f','t','carousel'],high:['n','f','t','carousel','fox','w'],elite:['n','f','t','carousel','fox','w','pig','a'],ultimate:['n','f','t','carousel','fox','w','pig','a','dino','h']};
+function getAvailableMonsters(level){if(level>=15)return[...MONSTER_POOL.ultimate];if(level>=10)return[...MONSTER_POOL.elite];if(level>=8)return[...MONSTER_POOL.high];if(level>=5)return[...MONSTER_POOL.mid];return[...MONSTER_POOL.low]}
+function line(x0,y0,x1,y1){const d=Math.hypot(x1-x0,y1-y0),n=Math.max(2,Math.round(d/6)),p=[];for(let i=0;i<=n;i++)p.push([x0+(x1-x0)*i/n,y0+(y1-y0)*i/n]);return p}
+function arc(cx,cy,r,a0,a1){const n=Math.max(6,Math.round(Math.abs(a1-a0)/0.12)),p=[];for(let i=0;i<=n;i++){const a=a0+(a1-a0)*i/n;p.push([cx+r*Math.cos(a),cy+r*Math.sin(a)])}return p}
+const PI=Math.PI;let travel=[...line(60,460,60,160),...arc(120,160,60,PI,1.5*PI),...line(120,100,300,100),...arc(300,160,60,1.5*PI,2*PI),...line(360,160,360,460),...arc(300,460,60,0,0.5*PI)];
+let full=[...travel,...line(300,520,120,520),...arc(120,460,60,0.5*PI,PI)];
+function resample(pts,st){const out=[[...pts[0]]];let acc=0;for(let i=1;i<pts.length;i++){let[px,py]=out[out.length-1];const[x,y]=pts[i];let d=Math.hypot(x-px,y-py);while(acc+d>=st){const t=(st-acc)/d;px+=(x-px)*t;py+=(y-py)*t;out.push([px,py]);d=Math.hypot(x-px,y-py);acc=0}acc+=d}return out}
+const PATH=resample(travel,3),FULL=resample(full,3),pathLen=(PATH.length-1)*3;
+const pointAt=d=>PATH[Math.max(0,Math.min(PATH.length-1,Math.round(d/3)))];
+function angleAt(i){const a=PATH[Math.min(PATH.length-1,i+2)],b=PATH[Math.max(0,i-2)];return Math.atan2(a[1]-b[1],a[0]-b[0])}
+const TICKS=[];for(let d=25;d<(FULL.length-1)*3;d+=50){const i=Math.round(d/3),p=FULL[i],q=FULL[Math.min(FULL.length-1,i+2)];TICKS.push({x:p[0],y:p[1],a:Math.atan2(q[1]-p[1],q[0]-p[0])})}
+let RES=1,fields=[];
+function fit(){const s=Math.min(innerWidth/W,innerHeight/H);app.style.transform=`translate(-50%,-50%) scale(${s})`;RES=Math.min(3,(devicePixelRatio||1)*Math.max(1,s));for(const f of fields){f.cv.width=W*RES;f.cv.height=H*RES;f.cv.style.width=W+'px';f.cv.style.height=H+'px';f.ctx.setTransform(RES,0,0,RES,0,0)}}
+addEventListener('resize',fit);addEventListener('orientationchange',fit);
+let state='menu',gameSeq=0,monSeq=1,mode='normal',gameTime=0,paused=false,radarDown=0,dualNames=['',''],dualColors=['#ff8f3d','#4aa8e8'],saveAcc=0,graphPending=null;
+function show(id){['menu','rules','guide','select','dualSel','records','rights','game','over'].forEach(s=>$(s).classList.toggle('hidden',s!==id));state=id}
+function makeField(i){const cv=$('cv'+i);return{idx:i,cv,ctx:cv.getContext('2d'),gridEl:$('grid'+i),fxEl:$('fx'+i),deckEl:$('deck'+i),sumEl:$('sum'+i),upgEl:$('upg'+i),infoEl:$('info'+i)||null,cells:Array(BAL.cells).fill(null),monsters:[],projs:[],spikes:[],barrels:[],rays:[],balls:[],clouds:[],portals:[],ttraps:[],vines:[],lavas:[],darkZones:[],sparkles:BAL.startSparkles,lives:1,level:1,summonCost:BAL.summonStart,spawned:0,spawnT:0.7,levelKills:0,totalKills:0,monHp:BAL.monHpFor(1),monSpeed:BAL.monSpd(1),deck:[],vaseT:0,ward:0,keyT:0,capriT:0,hourglassT:0,over:false,finalLevel:0}}
+for(let f=0;f<2;f++){const g=$('grid'+f);for(let i=0;i<BAL.cells;i++){const c=document.createElement('div');c.className='cell';c.dataset.i=i;c.dataset.f=f;c.style.left=(87+(i%5)*50)+'px';c.style.top=(212+Math.floor(i/5)*50)+'px';g.appendChild(c)}}
+const hasSave=()=>{try{return!!localStorage.getItem('fabSave')}catch(e){return false}};
+function refreshContinue(){$('btnContinue').classList.toggle('hidden',!hasSave())}
+function clearSave(){try{localStorage.removeItem('fabSave')}catch(e){}refreshContinue()}
+function saveGame(){if(state!=='game'||!fields.length)return;const d={mode,names:dualNames,colors:dualColors,t:gameTime,fields:fields.map(F=>({deck:F.deck,sparkles:F.sparkles,level:F.level,lives:F.lives,summonCost:F.summonCost,spawned:F.spawned,spawnT:F.spawnT,levelKills:F.levelKills,totalKills:F.totalKills,monHp:F.monHp,monSpeed:F.monSpeed,vaseT:F.vaseT,ward:F.ward,keyT:F.keyT,capriT:F.capriT,hourglassT:F.hourglassT,units:F.cells.filter(Boolean).map(u=>({k:u.key,l:u.level,t:u.tier,c:u.cell,c10:!!u.cam10,bloom:!!u.sakuraBloom,bStop:!!u.bStop,sleepPhase:u.sleepPhase||0,noUp:!!u.noUp,urnTimer:u.urnTimer||0,urnSilent:!!u.urnSilent,urnCd:u.urnCd||0,lastUp:u.lastUp||0,saltTimer:u.saltTimer||0,saltReady:!!u._saltReady,billiardNoMerge:!!u.billiardNoMerge,ek:u.eagleKills||0,mt:u.magT||0})),monsters:F.monsters.map(m=>({d:m.d,hp:m.hp,max:m.max,speed:m.speed,type:m.type,rw:m.rw,chew:m.chew,child:m.child||false,blockPass:m.blockPass||0,saltSlow:m.saltSlow||0})),barrels:F.barrels.map(s=>({d:s.d,hp:s.hp,max:s.max,life:s.life}))}))};try{localStorage.setItem('fabSave',JSON.stringify(d))}catch(e){}refreshContinue()}
+function loadGame(){let raw=null;try{raw=localStorage.getItem('fabSave')}catch(e){}if(!raw)return;const d=JSON.parse(raw);mode=d.mode;dualNames=d.names||['',''];dualColors=d.colors||['#ff8f3d','#4aa8e8'];gameTime=d.t||0;radarDown=0;paused=false;graphPending=null;$('btnPause').textContent='⏸';$('btnDuelPause').textContent='⏸';fields=d.fields.map((fd,i)=>{const F=makeField(i);F.deck=fd.deck.slice();F.sparkles=fd.sparkles;F.level=fd.level;F.lives=fd.lives;F.summonCost=fd.summonCost;F.spawned=fd.spawned;F.spawnT=fd.spawnT;F.levelKills=fd.levelKills;F.totalKills=fd.totalKills;F.monHp=fd.monHp;F.monSpeed=fd.monSpeed;F.vaseT=fd.vaseT||0;F.ward=fd.ward||0;F.keyT=fd.keyT||0;F.capriT=fd.capriT||0;F.hourglassT=fd.hourglassT||0;renderDeck(F);for(const un of fd.units){const u=addUnit(F,un.k,un.c,true);u.level=un.l;u.tier=(un.k==='vase'||un.k==='salt')?0:un.t;if(un.c10)u.cam10=true;if(un.bloom)u.sakuraBloom=true;if(un.bStop)u.bStop=true;if(un.sleepPhase!=null)u.sleepPhase=un.sleepPhase;if(un.noUp)u.noUp=true;if(un.urnTimer!=null)u.urnTimer=un.urnTimer;if(un.urnSilent!=null)u.urnSilent=un.urnSilent;if(un.urnCd!=null)u.urnCd=un.urnCd;if(un.lastUp!=null)u.lastUp=un.lastUp;if(un.saltTimer!=null)u.saltTimer=un.saltTimer;if(un.saltReady!=null)u._saltReady=un.saltReady;if(un.billiardNoMerge!=null)u.billiardNoMerge=un.billiardNoMerge;if(un.ek!=null)u.eagleKills=un.ek;if(un.mt!=null)u.magT=un.mt;if(un.k==='sakura'&&un.l===3)u.sakuraBloom=true;renderUnit(u)}for(const m of fd.monsters)F.monsters.push({id:monSeq++,d:m.d,hp:m.hp,max:m.max,frozen:0,speed:m.speed,type:m.type,rw:m.rw,chew:m.chew,burn:0,retreat:false,child:m.child||false,frzCd:0,blockPass:m.blockPass||0,saltSlow:m.saltSlow||0});for(const s of(fd.barrels||[]))F.barrels.push({d:s.d,hp:s.hp,max:s.max,life:s.life!=null?s.life:BARREL_HOLD({level:1,tier:0}),dead:false});return F});layoutFields();show('game');fit();updateHUD()}
+addEventListener('beforeunload',()=>saveGame());document.addEventListener('visibilitychange',()=>{if(document.hidden)saveGame()});
+$('btnContinue').onclick=()=>loadGame();
+function layoutFields(){const dual=mode==='dual';$('fw1').classList.toggle('hidden',!dual);$('bot1').classList.toggle('hidden',!dual);$('hud').style.display=dual?'none':'flex';$('btnDuelPause').classList.toggle('hidden',!dual);$('btnDuelPause').textContent=paused?'▶️':'⏸';if(dual){const s=0.6,x0=20,y0=60;$('fw0').style.transform=`translate(${-x0*s}px,${-y0*s}px) scale(${s})`;$('fw1').style.transform=`translate(${210-x0*s}px,${-y0*s}px) scale(${s})`;for(const F of fields)F.deckEl.style.display='none';$('bot0').style.cssText='top:310px;left:0;width:200px;bottom:auto';$('bot1').style.cssText='top:310px;left:210px;width:200px;bottom:auto';}else{$('fw0').style.transform='scale(1)';if(fields[0])fields[0].deckEl.style.display='';$('bot0').style.cssText='bottom:0';}}
+function askExit(cb){$('confirm').classList.remove('hidden');$('cYes').onclick=()=>{$('confirm').classList.add('hidden');cb()};$('cNo').onclick=()=>{$('confirm').classList.add('hidden')};$('cThink').onclick=()=>{$('confirm').classList.add('hidden');$('think').classList.remove('hidden')};$('tOk').onclick=()=>{$('think').classList.add('hidden')}}
+$('btnQuit').onclick=()=>askExit(()=>{gameOver()});
+$('quit0').onclick=()=>askExit(()=>{if(mode==='dual'){fields[0].over=true;fields[0].finalLevel=fields[0].level;checkDuelEnd()}else gameOver()});
+$('quit1').onclick=()=>askExit(()=>{if(mode==='dual'){fields[1].over=true;fields[1].finalLevel=fields[1].level;checkDuelEnd()}else gameOver()});
+$('btnPlay').onclick=()=>show('select');
+$('btnChallenge').onclick=()=>{const p=visible.filter(k=>k!=='cam'&&k!=='key');for(let i=p.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[p[i],p[j]]=[p[j],p[i]]}mode='challenge';startGame(p.slice(0,5))};
+$('btnGuide').onclick=()=>{gGroup='atk';renderGuide();show('guide')};$('btnGuideBack').onclick=()=>show('menu');
+$('btnRules').onclick=()=>{renderRules();show('rules')};$('btnRulesBack').onclick=()=>show('menu');
+$('btnRecords').onclick=()=>{recTab='norm';renderRecTabs();renderRecords();show('records')};$('btnRecBack').onclick=()=>show('menu');
+$('btnRights').onclick=()=>{renderRights();show('rights')};$('btnRightsBack').onclick=()=>show('menu');
+function renderRights(){
+$('rightsBox').innerHTML=
+'<p>'+t('rightsIntro')+'</p>'+
+'<div class="fp">'+t('author')+': '+AUTHOR+' / '+AUTHOR_RU+'</div>'+
+'<div class="fp">'+t('version')+': '+VERSION+' • '+RIGHTS_YEAR+'</div>'+
+'<div class="fp">'+t('sha')+': '+shaHex+'</div>'+
+'<p>'+t('rightsLicense')+'</p>'+
+'<div style="text-align:center;opacity:.8;font-size:11px;margin-top:8px">WEXUR © '+AUTHOR+'. All rights reserved.</div>';
+}
+const RULES_KEYS=['desc_capri','desc_astra','desc_star','desc_cherry','desc_portal','desc_station','desc_bubble','desc_can','desc_salt','desc_billiard','desc_hourglass','desc_snake','desc_dog','desc_lilac','desc_dino','desc_carousel','desc_plane','desc_radar','desc_vase','desc_yarn','desc_gem','desc_uran','desc_trans','desc_graph','desc_heart','desc_donut','desc_grape','desc_astra','desc_juice','desc_plane','desc_sleepy','desc_candy','desc_urn','desc_lava','desc_eclipse','desc_hook','desc_key','desc_buratino','desc_teddy','desc_barrel','desc_snow','desc_h','desc_fox','desc_pig','desc_fuel','desc_algae','desc_sakura','desc_fern','desc_a','desc_v','desc_immovable','desc_anchor','desc_cam','desc_duel','desc_rose','desc_solar','desc_cloud','desc_balloon','desc_triangle','desc_ext','desc_lady','desc_magnet','desc_eagle'];
+function renderRules(){$('rulesList').innerHTML=RULES_KEYS.map(k=>`<div class="rl">${t(k)}</div>`).join('')}
+let gGroup='atk',gU=null;
+Object.keys(GM).forEach(g=>{const b=document.createElement('button');b.className='gtab';b.style.background=GM[g].col;b.onclick=()=>{gGroup=g;renderGuide()};$('gTabs').appendChild(b)});
+function renderGuide(){[...$('gTabs').children].forEach((b,i)=>{b.classList.toggle('on',Object.keys(GM)[i]===gGroup);b.textContent=t(Object.keys(GM)[i])});$('gDetail').classList.add('hidden');$('gList').classList.remove('hidden');$('gList').innerHTML=visible.filter(k=>CHARS[k].grp===gGroup).map(k=>{const c=CHARS[k];return `<div class="grow" data-k="${k}"><span class="em">${c.e}</span><span class="nm">${c.n}</span>${badge(c.grp)}<span class="st">💥${c.dmg} ⚡${c.rate}/s</span><b>＋</b></div>`}).join('');[...$('gList').children].forEach(el=>el.onclick=()=>{gU={key:el.dataset.k,level:1,tier:0,cell:-1,billiardNoMerge:true,eagleKills:0,magT:0};gU.F={cells:[],monHp:300,totalKills:0,level:1,lavas:[],darkZones:[]};$('gList').classList.add('hidden');$('gDetail').classList.remove('hidden');renderG()})}
+function renderG(){const c=CHARS[gU.key];const gF=gU.F;let extra='';if(skillChance(gU)>0)extra+=`🎯 ${Math.round(skillChance(gU)*100)}% · `;if(gU.key==='magnet')extra+='🧲 45% / 8s · ';if(gU.key==='eagle')extra+=`🦅${gU.eagleKills||0} (+${Math.round(3*(gU.eagleKills||0))}%) · `;$('gdHead').innerHTML=`<span style="font-size:32px">${c.e}</span> <b>${c.n}</b> ${badge(c.grp)}<br><span class="st">💥${c.dmg} ⚡${c.rate}/s</span>`;$('gdStats').innerHTML=`Rank ${gU.level} ★${gU.tier}<br>💥 ${unitDmg(gF,gU)} · ⚡ ${unitRate(gF,gU).toFixed(2)}/s<br>${extra}<div style="text-align:left;margin-top:6px">${t(c.ab)}</div>`}
+$('gdLp').onclick=()=>{gU.level=Math.min(9,gU.level+1);renderG()};$('gdLm').onclick=()=>{gU.level=Math.max(1,gU.level-1);renderG()};$('gdTp').onclick=()=>{gU.tier=Math.min(4,gU.tier+1);renderG()};$('gdTm').onclick=()=>{gU.tier=Math.max(0,gU.tier-1);renderG()};$('gdBack').onclick=()=>renderGuide();
+const slotKeys=[null,null,null,null,null];const slotsBox=$('slots'),cardsBox=$('cards');
+for(let i=0;i<5;i++){const s=document.createElement('div');s.className='slot';s.dataset.i=i;s.onclick=()=>{slotKeys[i]=null;refreshSelect()};slotsBox.appendChild(s)}
+function buildCards(){cardsBox.innerHTML='';visible.forEach(k=>{const c=CHARS[k],d=document.createElement('div');d.className='card';d.dataset.k=k;d.innerHTML=`<span class="em">${c.e}</span><span><div class="nm">${c.n} 💥${c.dmg} ⚡${c.rate}/s</div><div class="st">${badge(c.grp)} ${t(c.ab)}</div></span>`;cardsBox.appendChild(d)})}buildCards();
+function refreshSelect(){[...slotsBox.children].forEach((s,i)=>s.textContent=slotKeys[i]?CHARS[slotKeys[i]].e:'');$('btnStart').disabled=slotKeys.some(x=>!x)}
+function tryPick(k,i){if(i===0&&k==='cam')return toast('❌ '+t('errCamFirst'));if(slotKeys.includes(k))return toast('❌ '+t('errDup'));if(k==='anchor'&&(slotKeys.includes('star')||slotKeys.includes('capri')))return toast('❌ '+t('errAnchorStar'));if(k==='star'&&slotKeys.includes('anchor'))return toast('❌ '+t('errStarAnchor'));if(k==='capri'&&slotKeys.includes('anchor'))return toast('❌ '+t('errCapriAnchor'));slotKeys[i]=k;refreshSelect()}
+const ghost=$('ghost');let drag=null;
+cardsBox.addEventListener('pointerdown',e=>{const c=e.target.closest('.card');if(!c)return;drag={k:c.dataset.k,x0:e.clientX,y0:e.clientY,moved:false};e.preventDefault()});
+addEventListener('pointermove',e=>{if(!drag||drag.du)return;if(Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)>8)drag.moved=true;if(drag.moved){ghost.classList.remove('hidden');ghost.textContent=CHARS[drag.k].e;ghost.style.left=e.clientX+'px';ghost.style.top=e.clientY+'px'}});
+addEventListener('pointerup',e=>{if(!drag||drag.du)return;ghost.classList.add('hidden');if(drag.moved){const el=document.elementFromPoint(e.clientX,e.clientY),sl=el&&el.closest('.slot');if(sl)tryPick(drag.k,+sl.dataset.i)}else{const i=slotKeys.indexOf(null);if(i>=0)tryPick(drag.k,i)}drag=null});
+$('btnStart').addEventListener('click',()=>{if(slotKeys.some(x=>!x))return;mode='normal';startGame(slotKeys.slice())});refreshSelect();
+let dsPlayer=1;const dsDecks=[[],[]];
+$('btnDual').onclick=()=>{dsPlayer=1;dsDecks[0]=[];dsDecks[1]=[];buildDualSel();show('dualSel')};$('btnDualBack').onclick=()=>show('menu');$('btnDualSwap').onclick=()=>{dsPlayer=dsPlayer===1?2:1;updDualUI()};
+function randomDuelDecks(){let pool=visible.filter(k=>!['cam','key','anchor','star','capri'].includes(k));for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}const a=pool.slice(0,5),b=pool.slice(5,10);while(a.length<5)a.push('sun');while(b.length<5)b.push('sun');return[a,b]}
+$('btnDualRandom').onclick=()=>{const[a,b]=randomDuelDecks();dsDecks[0]=a;dsDecks[1]=b;dsPlayer=1;updDualUI();toast('🎲 '+t('random'))};
+function buildDualSel(){$('dsSlots1').innerHTML='';$('dsSlots2').innerHTML='';$('dsCards').innerHTML='';for(let i=0;i<5;i++){const s1=document.createElement('div');s1.className='dselSlot';s1.onclick=()=>{dsDecks[0][i]=null;updDualUI()};$('dsSlots1').appendChild(s1);const s2=document.createElement('div');s2.className='dselSlot';s2.onclick=()=>{dsDecks[1][i]=null;updDualUI()};$('dsSlots2').appendChild(s2);}visible.filter(k=>k!=='cam'&&k!=='key').forEach(k=>{const c=CHARS[k];const d=document.createElement('div');d.className='dselCard';d.dataset.k=k;d.textContent=c.e;d.title=c.n;d.onclick=()=>{pickDual(k)};$('dsCards').appendChild(d)});updDualUI()}
+function pickDual(k){const arr=dsDecks[dsPlayer-1];const idx=arr.indexOf(null);if(idx<0)return toast('❌ '+t('errSlots'));if(arr.includes(k))return toast('❌ '+t('errDup'));if(k==='anchor'&&(arr.includes('star')||arr.includes('capri')))return toast('❌ '+t('errAnchorStar'));if(k==='star'&&arr.includes('anchor'))return toast('❌ '+t('errStarAnchor'));if(k==='capri'&&arr.includes('anchor'))return toast('❌ '+t('errCapriAnchor'));arr[idx]=k;updDualUI()}
+function updDualUI(){$('dsActiveLbl').textContent=t('activeP')+dsPlayer;for(let i=0;i<5;i++){$('dsSlots1').children[i].textContent=dsDecks[0][i]?CHARS[dsDecks[0][i]].e:'';$('dsSlots2').children[i].textContent=dsDecks[1][i]?CHARS[dsDecks[1][i]].e:'';}[...$('dsCards').children].forEach(el=>{const k=el.dataset.k;el.className='dselCard'+(dsDecks[0].includes(k)?' sel1':'')+(dsDecks[1].includes(k)?' sel2':'')});$('btnDualGo').disabled=dsDecks[0].some(x=>!x)||dsDecks[1].some(x=>!x)}
+$('btnDualGo').onclick=()=>{if(dsDecks[0].some(x=>!x)||dsDecks[1].some(x=>!x))return;dualNames=[$('dn1').value.trim()||t('player1'),$('dn2').value.trim()||t('player2')];dualColors=[$('dc1').value,$('dc2').value];mode='dual';startGameDual(dsDecks[0].slice(),dsDecks[1].slice())};
+function startGameDual(deck1,deck2){gameSeq++;clearSave();$('blackout').classList.add('hidden');$('toast').style.display='none';graphPending=null;fields=[makeField(0),makeField(1)];gameTime=0;radarDown=0;saveAcc=0;paused=false;$('btnPause').textContent='⏸';$('btnDuelPause').textContent='⏸';fields[0].deck=deck1;fields[1].deck=deck2;for(let fi=0;fi<2;fi++){const F=fields[fi];renderDeck(F);[...F.gridEl.children].forEach(c=>c.innerHTML='');addUnit(F,F.deck[0],Math.floor(Math.random()*BAL.cells))}$('popup').classList.add('hidden');layoutFields();show('game');fit();updateHUD();saveGame()}
+const REC={norm:{key:'spikeRecs',cap:30},chal:{key:'chalRecs',cap:30},duel:{key:'duelRecs',cap:20}};let recTab='norm';
+function renderRecTabs(){$('recTabs').innerHTML='';[['norm',t('tabNorm')],['chal',t('tabChal')],['duel',t('tabDuel')]].forEach(([id,lb])=>{const b=document.createElement('button');b.className='rtab'+(recTab===id?' on':'');b.textContent=lb;b.onclick=()=>{recTab=id;renderRecTabs();renderRecords()};$('recTabs').appendChild(b)})}
+const loadRecs=id=>{try{return JSON.parse(localStorage.getItem(REC[id].key)||'[]')}catch(e){return[]}};
+const saveRecs=(id,r)=>{try{localStorage.setItem(REC[id].key,JSON.stringify(r));flashSave()}catch(e){console.error("Save failed",e)}};
+function flashSave(){const ind=$('saveInd');ind.classList.add('show');setTimeout(()=>ind.classList.remove('show'),1000)}
+function pushRec(id,rec){const r=loadRecs(id);r.push(rec);r.sort((a,b)=>b.k-a.k);while(r.length>REC[id].cap){let i=-1;for(let j=r.length-1;j>=0;j--)if(!r[j].star){i=j;break}if(i<0)break;r.splice(i,1)}saveRecs(id,r)}
+function renderRecords(){const r=loadRecs(recTab);$('recList').innerHTML=r.length?r.map((x,i)=>{const bold=x.win?'font-weight:900;font-size:15px':'font-weight:700;font-size:13px';return `<div class="rec"><b>${i+1}.</b><button class="star" data-i="${i}">${x.star?'⭐':'☆'}</button><span style="color:${x.c};${bold}">${x.n}</span><span>👾${x.k}</span><span>🌊${x.l}</span><span>⏱${fmtTime(x.t||0)}</span><span style="margin-left:auto">${x.d||''}</span></div>`}).join(''):`<div class="hint">${t('empty')}</div>`;[...$('recList').querySelectorAll('.star')].forEach(b=>b.onclick=()=>{const r=loadRecs(recTab);r[+b.dataset.i].star=!r[+b.dataset.i].star;saveRecs(recTab,r);renderRecords()})}
+// ============ DECK PANEL: CLICK = PAUSE + DESCRIPTION ============
+function renderDeck(F){F.deckEl.innerHTML=F.deck.map(k=>`<div class="dk" data-k="${k}">${CHARS[k].e}</div>`).join('');[...F.deckEl.children].forEach(el=>{el.onclick=()=>openDeckInfo(el.dataset.k);});}
+function openDeckInfo(k){
+if(mode==='dual'||state!=='game')return;
+const c=CHARS[k];if(!c)return;
+paused=true;$('btnPause').textContent='▶️';$('btnDuelPause').textContent='▶️';
+$('dkInfoHead').innerHTML=`<span style="font-size:34px">${c.e}</span> <b>${c.n}</b> ${badge(c.grp)}<br><span class="st">💥${c.dmg} ⚡${c.rate}/s</span>`;
+$('dkInfoBody').innerHTML=`<div>${t(c.ab)}</div><div id="dkHintLine" class="hint" style="margin-top:8px;opacity:.75">${t('deckHint')}</div>`;
+$('btnDeckClose').textContent=t('closeResume');
+$('deckInfo').classList.remove('hidden');
+}
+$('btnDeckClose').onclick=()=>{$('deckInfo').classList.add('hidden');paused=false;$('btnPause').textContent='⏸';$('btnDuelPause').textContent='⏸';};
+// ================================================================
+function startGame(deckArr){gameSeq++;clearSave();$('blackout').classList.add('hidden');$('toast').style.display='none';graphPending=null;fields=mode==='dual'?[makeField(0),makeField(1)]:[makeField(0)];gameTime=0;radarDown=0;saveAcc=0;paused=false;$('btnPause').textContent='⏸';$('btnDuelPause').textContent='⏸';for(const F of fields){F.deck=deckArr.slice();renderDeck(F);[...F.gridEl.children].forEach(c=>c.innerHTML='');addUnit(F,F.deck[0],Math.floor(Math.random()*BAL.cells))}$('popup').classList.add('hidden');layoutFields();show('game');fit();updateHUD();saveGame()}
+function updateHUD(){if(mode==='dual'){for(const F of fields){F.sumEl.textContent='✨'+F.summonCost;F.upgEl.textContent='️';if(F.infoEl)F.infoEl.innerHTML=`<span style="color:${dualColors[F.idx]};font-weight:900">${dualNames[F.idx]}</span> ❤️${F.lives} ✨${F.sparkles} Lv.${F.level}`}}else{const F=fields[0];if(!F)return;$('hudLives').textContent='❤️'+F.lives;$('hudLevel').textContent=`Lv.${F.level} 👾${F.levelKills}/${waveSize(F.level)}`;$('hudSpark').textContent='✨'+F.sparkles;$('hudTime').textContent='⏱'+fmtTime(gameTime);F.sumEl.textContent='✨'+F.summonCost;if(F.infoEl)F.infoEl.textContent=''}}
+for(let i=0;i<2;i++){$('sum'+i).onclick=()=>summon(fields[i]);$('upg'+i).onclick=()=>{const F=fields[i];if(!F)return;doUpgrade(popUnit&&popUnit.F===F?popUnit:null)}};
+function countEagles(F,ignoreU=null){let n=0;for(const v of F.cells)if(v&&v.key==='eagle'&&v!==ignoreU)n++;return n}
+function compressWave(F,ratio){const alive=F.monsters.filter(m=>!m.dead);if(alive.length<2)return;let avg=0;for(const m of alive)avg+=m.d;avg/=alive.length;for(const m of alive){m.d=Math.max(0,Math.min(pathLen-1,avg+(m.d-avg)*ratio));}}
+function summon(F){if(!F||F.over)return;if(F.sparkles<F.summonCost)return floatAt(F,210,760,t('errSparkles'),'#ff5d7a');const empty=F.cells.map((c,j)=>c?-1:j).filter(j=>j>=0);if(!empty.length)return floatAt(F,210,760,t('errSpace'),'#ff5d7a');let key=null;if(F.deck.includes('cam')&&!camOnField(F)&&Math.random()<0.05)key='cam';if(!key){let pool=F.deck.filter(k=>k!=='cam'&&k!=='key'&&!(k==='eagle'&&countEagles(F)>=4));if(!pool.length)pool=F.deck.filter(k=>k!=='cam'&&k!=='key');if(pool.length)key=pool[Math.floor(Math.random()*pool.length)]}if(!key)key=F.deck.filter(k=>k!=='cam')[0]||'sun';F.sparkles-=F.summonCost;F.summonCost+=BAL.summonStep;const cell=empty[Math.floor(Math.random()*empty.length)];const u=addUnit(F,key,cell);if(key==='cam'){u.noUp=true;startBlackout(u)}updateHUD()}
+function startBlackout(u){const seq=gameSeq;$('blackout').classList.remove('hidden');setTimeout(()=>{if(seq!==gameSeq)return;$('blackout').classList.add('hidden');if(u.cell>=0&&u.F.cells[u.cell]===u)u.despawn=10},30000)}
+// ===== DOM-SYNC FIX (Windows 11 merge glitch): exactly ONE unit element per cell =====
+function enforceSingle(F,ci,keep){const cellEl=F.gridEl.children[ci];if(!cellEl)return;[...cellEl.children].forEach(ch=>{if(ch!==keep)ch.remove();});}
+function removeUnitEl(F,u){if(u.el&&u.el.parentNode)u.el.remove();if(u.cell>=0)enforceSingle(F,u.cell,null);}
+function addUnit(F,key,cell,force=false){if(key==='eagle'&&!force&&countEagles(F)>=4){key='sun';try{floatAt(F,cellPos(cell).x,cellPos(cell).y,t('errMaxEagle'),'#ff5d7a')}catch(e){}}const el=document.createElement('div');el.className='unit';const u={F,key,level:1,tier:0,t:0,stun:0,inc:0,cell,el,despawn:0,buffT:0,buffAdd:0,movedOnce:false,snowStun:0,sakuraBloom:false,bStop:false,sleepPhase:0,_awake:true,urnTimer:0,urnSilent:false,urnCd:0,lastUp:0,saltTimer:0,_saltReady:false,billiardNoMerge:true,eagleKills:0,magT:0};if(['gift','cam','anchor','vase','olive','salt'].includes(key))u.noUp=true;el.dataset.cell=cell;enforceSingle(F,cell,null);F.gridEl.children[cell].appendChild(el);F.cells[cell]=u;renderUnit(u);return u}
+function renderUnit(u){const ek=u.key==='eagle'?`<span class="ek">🦅${u.eagleKills||0}</span>`:'';u.el.innerHTML=`${CHARS[u.key].e}<span class="lv">${u.level}</span><span class="tr">${'★'.repeat(u.tier)}</span>${ek}`}
+$('btnPause').onclick=()=>{paused=!paused;$('btnPause').textContent=paused?'▶️':'⏸';$('btnDuelPause').textContent=paused?'▶️':'⏸'};$('btnDuelPause').onclick=()=>{paused=!paused;$('btnPause').textContent=paused?'▶️':'⏸';$('btnDuelPause').textContent=paused?'▶️':'⏸'};$('btnHome').onclick=()=>{saveGame();show('menu')};
+let uDrag=null;document.addEventListener('pointerdown',e=>{const el=e.target.closest('.unit');if(!el||state!=='game')return;const F=fields[+(el.closest('.fgrid').id.slice(-1))];uDrag={u:F.cells[+el.dataset.cell],x0:e.clientX,y0:e.clientY,moved:false};e.preventDefault()},true);
+addEventListener('pointermove',e=>{if(!uDrag)return;if(Math.hypot(e.clientX-uDrag.x0,e.clientY-uDrag.y0)>10)uDrag.moved=true;if(uDrag.moved){ghost.classList.remove('hidden');ghost.textContent=CHARS[uDrag.u.key].e;ghost.style.left=e.clientX+'px';ghost.style.top=e.clientY+'px'}});
+addEventListener('pointerup',e=>{if(!uDrag||uDrag.du)return;ghost.classList.add('hidden');const u=uDrag.u,F=u.F,moved=uDrag.moved;uDrag=null;if(u.key==='star'&&u.level<19&&moved){toast('❌  Lvl 19!');return}if(!moved){if(graphPending&&graphPending===F){const el2=document.elementFromPoint(e.clientX,e.clientY),ce=el2&&el2.closest('.cell');if(ce&&ce.closest('.fgrid')===F.gridEl){const tt=F.cells[+ce.dataset.i];if(tt&&tt.key!=='graph'){const maxLv=F._gs||9;if(tt.level<=maxLv){tt.level=Math.min(9,tt.level+1);tt.lastUp=gameTime;renderUnit(tt);const pp=cellPos(tt.cell);floatAt(F,pp.x,pp.y,'📈+1','#7ef59b')}else{floatAt(F,pp.x,pp.y,'📈 High','#ff5d7a')}graphPending=null;return}}graphPending=null;return;}openPopup(u);return}const el=document.elementFromPoint(e.clientX,e.clientY),cellEl=el&&el.closest('.cell');if(!cellEl||cellEl.closest('.fgrid')!==F.gridEl)return;const ti=+cellEl.dataset.i,t=F.cells[ti];if(t&&t!==u){if(t.key==='urn'){if(u.key==='station'){F.cells[u.cell]=null;removeUnitEl(F,u);t.urnCd=45;t.urnTimer=0;t.urnSilent=false;F.sparkles+=35;floatAt(F,cellPos(ti).x,cellPos(ti).y,'🚉+35✨','#ffd23f');return}if(!isImm(u.key,u)&&u.level===1&&u.tier===0&&u.key!=='urn'){if(t.urnCd>0){floatAt(F,cellPos(ti).x,cellPos(ti).y,'⚱️ CD!','#888');return}F.cells[u.cell]=null;removeUnitEl(F,u);t.urnCd=45;t.urnTimer=0;t.urnSilent=false;if(Math.random()<0.35){t.level=Math.min(9,t.level+1);t.lastUp=gameTime;renderUnit(t);floatAt(F,cellPos(ti).x,cellPos(ti).y,'⚱️+1!','#c9a066')}else{floatAt(F,cellPos(ti).x,cellPos(ti).y,'⚱️ Fail','#888')}return}}if(u.key==='station'||t.key==='station'){toast('❌ 🚉!');return}const camPair=(u.key==='cam'&&(t.key==='disco'||t.key==='trans'))||(t.key==='cam'&&(u.key==='disco'||u.key==='trans'));const teaPair=(u.key==='teapot'&&t.key==='tangerine')||(u.key==='tangerine'&&t.key==='teapot');const balPair=(u.key==='balloon'&&(t.key==='balloon'||CHARS[t.key].grp==='sup'))||(t.key==='balloon'&&(u.key==='balloon'||CHARS[u.key].grp==='sup'));if(u.key==='anchor'&&isImm(t.key,t)){if(t.key==='station'){toast('❌ 🚉!');return}return swapCells(F,u,t)}if(camPair)tryMerge(F,u,t);else if(teaPair)tryMerge(F,u,t);else if(balPair)tryMerge(F,u,t);else if((t.key===u.key||t.key==='trans'||u.key==='trans')&&!u.cam10&&!t.cam10&&u.key!=='cam'&&t.key!=='cam')tryMerge(F,u,t);else toast('❌ '+t('errNoMerge'));}else if(!t){if(isImm(u.key,u))return toast('❌ '+t('errMoveImmov'));if(u.key==='vase'){if(u.movedOnce)return toast('🏺!');u.movedOnce=true}const old=u.cell;F.cells[old]=null;F.cells[ti]=u;u.cell=ti;u.el.dataset.cell=ti;enforceSingle(F,ti,null);F.gridEl.children[ti].appendChild(u.el);enforceSingle(F,old,null);}});
+function swapCells(F,a,b){const ca=a.cell,cb=b.cell;F.cells[ca]=b;F.cells[cb]=a;a.cell=cb;b.cell=ca;a.el.dataset.cell=cb;b.el.dataset.cell=ca;F.gridEl.children[cb].appendChild(a.el);F.gridEl.children[ca].appendChild(b.el);enforceSingle(F,ca,b.el);enforceSingle(F,cb,a.el)}
+function tryMerge(F,src,tgt){const camU=src.key==='cam'?src:(tgt.key==='cam'?tgt:null);if(camU){const o=camU===src?tgt:src;const p=cellPos(camU.cell);F.cells[o.cell]=null;removeUnitEl(F,o);if(Math.random()<0.25){camU.level=10;camU.tier=0;camU.cam10=true;camU.noUp=true;camU.despawn=0;floatAt(F,p.x,p.y,'🎥10!','#fff');renderUnit(camU)}else{for(const v of F.cells)if(v){v.level=1;v.tier=0;v.noUp=(v.key==='salt'||v.key==='vase'||v.key==='gift'||v.key==='cam'||v.key==='anchor'||v.key==='olive');v.billiardNoMerge=true;renderUnit(v)}F.cells[camU.cell]=null;removeUnitEl(F,camU);floatAt(F,p.x,p.y,'💀 Reset','#ff5d7a')}enforceSingle(F,camU.cell,camU.cell>=0&&F.cells[camU.cell]===camU?camU.el:null);return}if(src.key==='vase'||tgt.key==='vase'){const v=src.key==='vase'?src:tgt;if(vaseAdj(F,v))return toast('🏺!')}if(src.key==='trans'||tgt.key==='trans'){const tr=src.key==='trans'?src:tgt,ot=tr===src?tgt:src;const p=cellPos(tr.cell);F.cells[tr.cell]=null;removeUnitEl(F,tr);if(Math.random()<skillChance(tr)){const c=addUnit(F,ot.key,tr.cell);c.level=ot.level;c.tier=ot.tier;c.noUp=ot.noUp;c.billiardNoMerge=ot.billiardNoMerge;if(ot.key==='sakura'&&ot.level===3)c.sakuraBloom=true;if(c.key==='eagle'&&ot.key==='eagle')c.eagleKills=ot.eagleKills||0;renderUnit(c);floatAt(F,p.x,p.y,'🔁','#ffbf00')}else{F.cells[ot.cell]=null;removeUnitEl(F,ot);floatAt(F,p.x,p.y,'💀','#ff5d7a')}return}if(src.key==='graph'&&tgt.key==='graph'){const p=cellPos(tgt.cell);F.cells[src.cell]=null;removeUnitEl(F,src);const ch=Math.min(1.0,0.5+0.1*(tgt.level-1));if(Math.random()<ch){tgt.level=Math.min(9,tgt.level+1);tgt.lastUp=gameTime;renderUnit(tgt);graphPending=F;F._gs=tgt.level*2;floatAt(F,p.x,p.y,'📈 Target (≤'+(tgt.level*2)+')','#7ef59b')}else{F.cells[tgt.cell]=null;removeUnitEl(F,tgt);floatAt(F,p.x,p.y,'💀 Both','#ff5d7a')}return}if(src.level!==tgt.level)return toast('❌ '+t('errSameRank'));if(tgt.key==='disc'&&src.key==='disc'){const p=cellPos(tgt.cell);F.cells[src.cell]=null;removeUnitEl(F,src);const r=Math.random()*101;const nl=tgt.level+1;if(r<3){F.cells[tgt.cell]=null;removeUnitEl(F,tgt);floatAt(F,p.x,p.y,'💀 Both','#ff5d7a');return}let nk='disc';if(r<16)nk='disc';else if(r<41)nk='sun';else if(r<66)nk='astra';else if(r<78.5)nk='dog';else if(r<91)nk='diamond';else nk='lady';tgt.key=nk;tgt.level=nl;tgt.noUp=false;tgt.billiardNoMerge=false;tgt.lastUp=gameTime;floatAt(F,p.x,p.y,'💿→'+CHARS[nk].e+' Lvl'+nl,'#c0c0ff');renderUnit(tgt);enforceSingle(F,tgt.cell,tgt.el);return}const teaPair=(src.key==='teapot'&&tgt.key==='tangerine')||(src.key==='tangerine'&&tgt.key==='teapot');if(teaPair){const p=cellPos(tgt.cell);F.cells[src.cell]=null;removeUnitEl(F,src);tgt.key=Math.random()<0.55?'tangerine':'teapot';tgt.level+=1;tgt.noUp=false;tgt.billiardNoMerge=false;tgt.lastUp=gameTime;renderUnit(tgt);floatAt(F,p.x,p.y,'⬆️','#7ed957');if(Math.random()<0.05){const e2=F.cells.map((c,j)=>c?-1:j).filter(j=>j>=0);if(e2.length)addUnit(F,'tangerine',e2[Math.floor(Math.random()*e2.length)])}enforceSingle(F,tgt.cell,tgt.el);return}if(src.key==='balloon'||tgt.key==='balloon'){const p=cellPos(tgt.cell);const otherKey=(src.key==='balloon'?tgt.key:src.key);F.cells[src.cell]=null;removeUnitEl(F,src);const nl=tgt.level+1;let nk;if(Math.random()<0.15)nk='balloon';else nk=otherKey!=='balloon'?otherKey:(F.deck.length?F.deck.filter(k=>k!=='key')[Math.floor(Math.random()*F.deck.filter(k=>k!=='key').length)]||'balloon':'balloon');tgt.key=nk;tgt.level=nl;tgt.noUp=false;tgt.billiardNoMerge=false;tgt.lastUp=gameTime;floatAt(F,p.x,p.y,'🎈→'+CHARS[nk].e,'#ff8ab5');renderUnit(tgt);enforceSingle(F,tgt.cell,tgt.el);return}if(src.key==='eagle'&&tgt.key==='eagle'){tgt.eagleKills=(tgt.eagleKills||0)+(src.eagleKills||0);}const p=cellPos(tgt.cell);F.cells[src.cell]=null;removeUnitEl(F,src);if(tgt.key==='coco'){const b=cocoBonus(src,tgt);F.sparkles+=b;floatAt(F,p.x,p.y-24,'+'+b+'✨','#c789ff')}if(tgt.key==='plug'){if(Math.random()<skillChance(tgt)){const b=plugBonus(src,tgt);F.sparkles+=b;floatAt(F,p.x,p.y-24,'+'+b+'✨','#ffe14d')}else zapAtk(F)}let nl=tgt.level+1;if((src.key==='maple'||tgt.key==='maple')&&Math.random()<0.07){nl+=1;floatAt(F,p.x,p.y-40,'🍁 +2!','#ff7f2a')}let ch=false;if(Math.random()>=stayP(tgt.key)){let pool;if(tgt.key==='gift')pool=visible.filter(k=>k!=='cam'&&k!=='key');else{pool=F.deck.length?F.deck.filter(k=>k!=='key'):visible.filter(k=>k!=='key');if(camOnField(F))pool=pool.filter(k=>k!=='cam')}const o=pool.filter(k=>k!==tgt.key&&!(k==='eagle'&&countEagles(F,tgt)>=4));if(o.length){tgt.key=o[Math.floor(Math.random()*o.length)];ch=true;if(tgt.key==='gift'||tgt.key==='cam'||tgt.key==='anchor'||tgt.key==='vase'||tgt.key==='olive'||tgt.key==='salt')tgt.noUp=true;else tgt.noUp=false;if(tgt.key==='vase')tgt.tier=0;if(tgt.key==='eagle')tgt.eagleKills=tgt.eagleKills||0;}}tgt.level=nl;tgt.lastUp=gameTime;tgt.billiardNoMerge=false;if(tgt.key==='sakura'&&tgt.level===3)tgt.sakuraBloom=true;if(tgt.key==='vase')tgt.tier=0;floatAt(F,p.x,p.y,(ch?'🔄':'️')+CHARS[tgt.key].e,ch?'#c789ff':'#7ed957');renderUnit(tgt);enforceSingle(F,tgt.cell,tgt.el);enforceSingle(F,src.cell,null)}
+function zapAtk(F){let b=null;for(const v of F.cells)if(v&&CHARS[v.key].cls==='atk'){if(!b||v.level>b.level)b=v}if(b){b.stun=15;const p=cellPos(b.cell);floatAt(F,p.x,p.y,'⚡','#ffe14d')}}
+const cellPos=i=>({x:87+(i%5)*50+23,y:212+Math.floor(i/5)*50+23});let popUnit=null;
+function openPopup(u){popUnit=u;if(mode==='dual'){updateHUD();return}const c=CHARS[u.key];$('popInfo').innerHTML=`${c.e} Lv.${u.level} ★${u.tier} 💥${unitDmg(u.F,u)} ⚡${unitRate(u.F,u).toFixed(1)}/s`;$('btnUpg').textContent=(u.tier>=4||u.noUp)?'MAX':`⬆️✨${UPG_COST[u.tier]}`;$('popup').classList.remove('hidden')}
+$('btnPopClose').onclick=()=>{$('popup').classList.add('hidden');popUnit=null};$('btnUpg').onclick=()=>doUpgrade(popUnit);
+function doUpgrade(u){if(!u)return;if(u.noUp)return toast('❌ '+t('errUpgrade'));if(u.tier>=4)return;const c=UPG_COST[u.tier];if(u.F.sparkles<c)return floatAt(u.F,210,700,t('errSparkles'),'#ff5d7a');u.F.sparkles-=c;u.tier++;u.lastUp=gameTime;if(u.key==='billiard')u.billiardNoMerge=false;renderUnit(u);if(mode!=='dual')openPopup(u)}
+function unitDmg(F,u){if(u.key==='cam')return u.cam10?7700:3;if(u.key==='hook')return 73;if(u.key==='yarn'){let d=yarnBallDmg(F,u);d*=1+Math.max(-0.6,auraOf(F,u));return Math.round(d)}if(u.key==='vase'){const v=vasePick(F,u);if(!v)return 0;return Math.round(unitDmg(F,v)*vasePct(u)*10)/10}const c=CHARS[u.key];let d=c.dmg;const n=u.level-1;if(c.cls==='atk')d*=(1+0.5*n)*multOf(u);else if(c.cls==='semi')d*=(1+0.35*n)*multOf(u);else if(c.cls==='trans')d*=(1+0.35*n)*multOf(u);if(u.key==='dog')d*=dogMod(F,u).dm;if(u.key==='cherry'){d*=sakuraBoost(F,u);d*=cherryBoost(F,u)}if(u.key==='ball')d*=algaeBallBoost(F,u);if(u.key==='plane')d*=planeDmg(F,u);if(u.key==='snake')d*=snakeDmg(F,u);if(u.key==='sleepy')d*=sleepyDmg(F,u);if(u.key==='juice')d*=juiceDmgBonus(F,u);if(u.key==='pumpkin'&&bubbleAdj(F,u))d*=1.2;if(u.key==='maple'&&wormAdj(F,u))d*=1.4;if(u.key==='astra'||u.key==='capri')d*=astraCapriBoost(F,u);if(u.key==='triangle'||u.key==='portal')d*=pairBoost(F,u);if(u.key==='star'&&starOk(F,u))d*=2.5;if(u.key==='capri'){d*=Math.pow(3,graphAdjCount(F,u));if(adjAlgae(F,u))d*=1.1;}if(u.key==='billiard')d*=billiardDecay(u);if(u.key==='eagle')d*=1+0.03*(u.eagleKills||0);d*=heartBoost(F,u);d*=1+Math.max(-0.6,auraOf(F,u));return Math.round(d*10)/10}
+function adjAlgae(F,u){if(u.cell<0)return false;for(const j of nbOf(u.cell)){if(j<0||j>=F.cells.length)continue;const v=F.cells[j];if(v&&v.key==='algae')return true}return false}
+function unitRate(F,u){if(u.key==='cam')return 1.1;if(u.key==='hook')return 0.05;if(u.key==='vase'){const v=vasePick(F,u);if(!v)return 0;return Math.round(unitRate(F,v)*100)/100}const c=CHARS[u.key];let r=c.rate;if(c.cls==='atk')r*=lvlRate(u.level)*(1+0.25*u.tier);else if(c.cls==='semi')r*=1+(lvlRate(u.level)-1)*0.5;else if(c.cls==='trans')r*=1+0.15*(u.tier+(u.level-1));if(u.key==='fuel'){const cnt=Math.max(1,fuelCount(F));r*=(cnt%2===0?3:1/3)}if(u.key==='dog')r*=dogMod(F,u).m;if(u.key==='astra'||u.key==='sun')r*=astraSunRate(F,u);if(u.key==='sleepy')r*=sleepyRate(F,u);if(u.key==='snake')r*=snakeRate(F,u);if(u.key==='urn')r*=urnRate(F,u);if(c.cls==='semi'&&stationSide(F,u))r*=6;if((u.key==='urn'||u.key==='barrel'||u.key==='plug')&&bubbleAdj(F,u))r*=1.2;if(u.key==='capri'&&(gameTime-(u.lastUp||0))<60)r*=4;if(u.buffT>0)r*=1+u.buffAdd;r*=1+Math.max(-0.6,auraOf(F,u));return Math.round(r*100)/100}
+function skillChance(u){if(u.key==='trans')return Math.min(0.95,0.63+0.05*u.tier);const P={rose:[0.6,0.95,0.9],snow:[0.25,0.65,0.93],kiwi:[0.5,0.9,0.92],barrel:[0.05,0.16,0.9],solar:[0.09,0.30,0.92],graph:[0.7,0.97,0.95],cloud:[0.2,0.6,0.92],trans:[0.5,0.9,0.92],plug:[0.5,0.9,0.92]}[u.key];if(!P)return 0;const n=u.tier+(u.level-1);let ch=P[1]-(P[1]-P[0])*Math.pow(P[2],n)+auraOf(u.F,u)*0.05;if(['rose','snow','plug'].includes(u.key))ch+=luckOf(u.F,u);return Math.min(0.95,ch)}
+function spawnMonster(F,boss){let type='n',hp=F.monHp,sp=F.monSpeed,rw=BAL.killReward,chew=F.monHp*0.02,blockPass=0;if(boss){type='b';hp=F.monHp*14;sp=F.monSpeed*0.55;rw=250+10*F.level;chew*=6;}else{const avail=getAvailableMonsters(F.level);type=avail[Math.floor(Math.random()*avail.length)];switch(type){case 'h':hp=F.monHp*0.3;sp=F.monSpeed*1.8;rw=40;chew*=0.5;break;case 'dino':hp=F.monHp*4.5;sp=F.monSpeed*0.35;rw=120;chew*=3;break;case 'w':hp=F.monHp*1.35;sp=F.monSpeed*0.5;rw=85;chew=F.monHp*0.035;break;case 'fox':hp=F.monHp*1.3;sp=F.monSpeed*1.5;rw=50;chew*=0.8;blockPass=2;break;case 'pig':hp=F.monHp*2.8;sp=F.monSpeed*0.6;rw=90;chew*=2.5;break;case 'carousel':hp=F.monHp*1.1;sp=F.monSpeed*1.0;rw=35;chew*=1.2;break;case 't':hp=F.monHp*2.5;sp=F.monSpeed*0.6;rw=75;chew*=2;break;case 'f':hp=F.monHp*0.5;sp=F.monSpeed*1.8;break;case 'v':hp*=1.6;sp*=0.9;rw=100;break;case 'a':hp*=1.3;sp*=0.7;rw=40;break;default:break;}}F.monsters.push({id:monSeq++,d:0,hp,max:hp,frozen:0,speed:sp,type,rw,chew,burn:0,retreat:false,frzCd:0,blockPass,saltSlow:0});if(type==='b')floatAt(F,210,200,'🐲 BOSS!','#ff4d5e');if(type==='w')floatAt(F,210,200,'⛄ Frost!','#7fd4ff');if(type==='h')floatAt(F,210,200,'🚁 Heli!','#aabbee');if(type==='fox')floatAt(F,210,200,'🦊 Fox!','#ff8c00');if(type==='pig')floatAt(F,210,200,'🐷 Pig!','#ffb6c1');if(type==='dino')floatAt(F,210,200,'🦖 Dino!','#228b22');if(type==='carousel')floatAt(F,210,200,'🎠 Carousel!','#ff69b4')}
+const pickT=F=>{let b=null;for(const m of F.monsters)if(!b||m.d>b.d)b=m;return b};const pickL=F=>{let b=null;for(const m of F.monsters)if(!m.dead&&(!b||m.d<b.d))b=m;return b};const randT=F=>{const a=monsters_filter(F);return a.length?a[Math.floor(Math.random()*a.length)]:null};function monsters_filter(F){return F.monsters.filter(m=>!m.dead)}
+function floatAt(F,x,y,t,c){const f=document.createElement('div');f.className='flo';f.textContent=t;f.style.left=(x-20)+'px';f.style.top=(y-20)+'px';f.style.color=c||'#fff';F.fxEl.appendChild(f);setTimeout(()=>f.remove(),900)}
+function stepField(F,dt){if(F.over)return;if(F.ward>0)F.ward-=dt;const capriCount=F.cells.filter(v=>v&&v.key==='capri').length;if(capriCount>0){F.capriT+=dt;if(F.capriT>=35){F.capriT-=35;F.sparkles=Math.max(0,F.sparkles-12*capriCount);floatAt(F,210,300,'♑ -'+(12*capriCount)+'✨','#cccc00')}}const hgCount=F.cells.filter(v=>v&&v.key==='hourglass').length;if(hgCount>0){F.hourglassT+=dt;if(F.hourglassT>=30){F.hourglassT-=30;F.sparkles=Math.max(0,F.sparkles-15*hgCount);floatAt(F,210,300,'⏳ -'+(15*hgCount)+'✨','#ffd93d')}}const hasHourglass=F.cells.some(v=>v&&v.key==='hourglass');for(const s of F.barrels){s.life-=dt;if(s.life<=0){s.dead=true;const[x,y]=pointAt(s.d);floatAt(F,x,y,'⏳','#5ab8ff')}if(s.d>=pathLen-30)s.dead=true}F.barrels=F.barrels.filter(s=>!s.dead);for(const lv of F.lavas){lv.t-=dt;if(lv.t<=0){lv.dead=true;continue}for(const m of F.monsters)if(!m.dead&&Math.abs(m.d-lv.d)<18){damage(F,m,lv.dps*dt,'semi',null)}}F.lavas=F.lavas.filter(l=>!l.dead);for(const dz of F.darkZones){dz.t-=dt;if(dz.t<=0){dz.dead=true;continue}for(const m of F.monsters)if(!m.dead&&m.type!=='b'&&m.type!=='a'&&Math.abs(m.d-dz.d)<28){m._darkSlow=0.6;m._darkVuln=1.2}}F.darkZones=F.darkZones.filter(z=>!z.dead);const ws=waveSize(F.level);if(F.spawned<ws){F.spawnT-=dt;if(F.spawnT<=0){const isBoss=F.level%5===0&&F.spawned>=ws-1;spawnMonster(F,isBoss);F.spawned++;if(!isBoss&&F.level>=4&&F.spawned<ws&&F.spawned%7===0){spawnMonster(F,false);F.spawned++;}F.spawnT=BAL.spawnInt(F.level)}}for(const p of F.portals){for(const m of F.monsters)if(!m.dead&&m.type!=='a'&&!p.used[m.id]&&Math.abs(m.d-p.d)<15){p.used[m.id]=1;m.d=0;const[x,y]=pointAt(p.d);floatAt(F,x,y,'💠','#66e0ff')}}for(const p of F.portals)p.t-=dt;F.portals=F.portals.filter(p=>p.t>0);for(const c of F.clouds){for(const m of F.monsters)if(!m.dead&&Math.abs(m.d-c.d)<22)damage(F,m,c.dps*dt,'semi',null);c.t-=dt}F.clouds=F.clouds.filter(c=>c.t>0);for(const t2 of F.ttraps){for(const m of F.monsters)if(!m.dead&&Math.abs(m.d-t2.d)<12){damage(F,m,t2.dmg,'semi',null);t2.dead=true;const[x,y]=pointAt(t2.d);floatAt(F,x,y,'📐','#f5f580');break}}F.ttraps=F.ttraps.filter(t2=>!t2.dead);for(const m of F.monsters){if(m.frzCd>0)m.frzCd-=dt;if(m.saltSlow>0)m.saltSlow-=dt;if(m.burn>0){damage(F,m,m.burn*dt,'semi',null);for(const o of F.monsters)if(o!==m&&!o.dead&&Math.abs(o.d-m.d)<20)damage(F,o,m.burn*dt,'semi',null)}let sp=m.speed;if(m._darkSlow){sp*=m._darkSlow;delete m._darkSlow}if(m._darkVuln){delete m._darkVuln}if(hasHourglass)sp*=0.75;if(m.saltSlow>0)sp*=0.5;if(m.type!=='a')for(const v of F.vines)if(Math.abs(m.d-v.d)<20)sp*=0.45;if(m.retreat){m.d-=sp*dt;for(const o of F.monsters)if(o!==m&&!o.dead&&Math.abs(o.d-m.d)<15)damage(F,o,0.25*o.hp*dt,'semi',null);if(m.d<=0){m.d=0;m.retreat=false}}else if(m.frozen>0&&m.type!=='a')m.frozen-=dt;else{const nd=m.d+sp*dt;let hit=null;for(const s of F.barrels){if(!s.dead&&nd>=s.d-6&&m.d<=s.d+6){if(m.blockPass>0){m.blockPass--;m.d=nd}else{hit=s}break}}if(hit){m.d=Math.min(nd,hit.d-6);hit.hp-=barrelChewDps(F)*(CHEW_MULT[m.type]||1)*dt;if(hit.hp<=0){hit.dead=true;const[x,y]=pointAt(hit.d);floatAt(F,x,y,'💥','#5ab8ff')}}else m.d=nd}if(!m.retreat&&m.d>=pathLen){m.dead=true;if(m.type==='fox'){const steal=Math.min(100,F.sparkles);F.sparkles-=steal;floatAt(F,210,420,'🦊 -'+steal+'✨','#ff8c00')}else if(!(F.ward>0&&m.type!=='b')){F.lives--;floatAt(F,210,420,'💀 '+t('breach'),'#ff5d7a')}}}for(const r of F.rays){for(const m of F.monsters)if(!m.dead&&Math.abs(m.d-r.d)<22){if(!m.rh)m.rh={};if(!m.rh[r.id]){m.rh[r.id]=1;damage(F,m,r.dmg,'semi',null);const[x,y]=pointAt(m.d);floatAt(F,x,y,'🔆','#ff5da0')}}}for(const r of F.rays)r.t-=dt;F.rays=F.rays.filter(r=>r.t>0);for(const b of F.balls){b.d-=b.speed*dt;for(const m of F.monsters)if(!m.dead&&!b.hits.includes(m.id)&&Math.abs(m.d-b.d)<12){b.hits.push(m.id);damage(F,m,b.dmg,'semi',null);const[x,y]=pointAt(m.d);floatAt(F,x,y,'🧶','#ff6fa5')}for(const s of F.spikes)if(!s.dead&&Math.abs(s.d-b.d)<10){s.dead=true;b.dead=true}for(const s of F.barrels)if(!s.dead&&Math.abs(s.d-b.d)<10){s.dead=true;b.dead=true}if(b.d<=0)b.dead=true}F.balls=F.balls.filter(b=>!b.dead);const keyCount=F.cells.filter(v=>v&&v.key==='key').length;const hasBura=F.cells.some(v=>v&&v.key==='buratino');if(hasBura&&keyCount>0){for(let j=0;j<F.cells.length;j++){const v=F.cells[j];if(v&&v.key==='key'){F.cells[j]=null;removeUnitEl(F,v)}}F.deck=F.deck.filter(k=>k!=='key')}if(keyCount>=7&&!hasBura){const empty=F.cells.map((c,j)=>c?-1:j).filter(j=>j>=0);if(empty.length){const bu=addUnit(F,'buratino',empty[Math.floor(Math.random()*empty.length)]);bu.level=1;bu.tier=0;renderUnit(bu);const pp=cellPos(bu.cell);floatAt(F,pp.x,pp.y,'🪵 SPECIAL!','#ffd23f');for(let j=0;j<F.cells.length;j++){const v=F.cells[j];if(v&&v.key==='key'){F.cells[j]=null;removeUnitEl(F,v)}}F.deck=F.deck.filter(k=>k!=='key')}}F.keyT+=dt;if(F.keyT>=5){F.keyT-=5;if(F.level>=20&&!hasBura&&keyCount>0){for(let j=0;j<F.cells.length;j++){const v=F.cells[j];if(v&&v.key==='key'){F.cells[j]=null;removeUnitEl(F,v)}}floatAt(F,210,300,'🗝️ Deleted','#ff5d7a')}}for(const u of F.cells){if(!u)continue;if(u.buffT>0){u.buffT-=dt;if(u.buffT<=0)u.buffAdd=0}if(u.despawn>0){u.despawn-=dt;if(u.despawn<=0){F.cells[u.cell]=null;removeUnitEl(F,u);continue}}if(u.key==='trans'){u.inc+=dt;if(u.inc>=30){u.inc-=30;F.sparkles=Math.max(0,F.sparkles-10);const p=cellPos(u.cell);floatAt(F,p.x,p.y,'-10✨','#ff5d7a')}}if(u.key==='graph'){u.inc+=dt;if(u.inc>=20){u.inc-=20;F.sparkles=Math.max(0,F.sparkles-30);const p=cellPos(u.cell);floatAt(F,p.x,p.y,'-30✨','#ff5d7a')}}if(u.key==='buratino'&&!u.bStop){u.inc+=dt;if(u.inc>=15){u.inc-=15;if(u.level<7){if(Math.random()<0.75){u.level++;u.lastUp=gameTime;renderUnit(u);const p=cellPos(u.cell);floatAt(F,p.x,p.y,'🪵+1','#d9a066')}else{u.bStop=true;const p=cellPos(u.cell);floatAt(F,p.x,p.y,'🪵 Stop','#ff5d7a')}}}}if(u.key==='sleepy'){u.sleepPhase+=dt;if(u.sleepPhase>=30){u.sleepPhase-=30;u._awake=!u._awake;const p=cellPos(u.cell);floatAt(F,p.x,p.y,u._awake?'💤⬆️':'😴',u._awake?'#7ed957':'#aaaaff')}if(!u._awake){u.el.style.opacity=.35;continue}else if(u.el.style.opacity)u.el.style.opacity=''}if(u.key==='urn'){if(u.urnCd>0){u.urnCd-=dt;if(u.urnCd<=0)u.urnCd=0}if(!u.urnSilent){u.urnTimer+=dt;if(u.urnTimer>=45){u.urnSilent=true;u.urnTimer=0;const p=cellPos(u.cell);floatAt(F,p.x,p.y,'⚱️','#888')}}if(u.urnSilent){u.el.style.opacity=.35;continue}else if(u.el.style.opacity)u.el.style.opacity=''}if(u.key==='worm'){u.inc+=dt;if(u.inc>=60){u.inc-=60;if(Math.random()<0.05){const e=nbOf(u.cell).filter(j=>j>=0&&j<F.cells.length&&!F.cells[j]);if(e.length){addUnit(F,'tomato',e[Math.floor(Math.random()*e.length)]);const p=cellPos(u.cell);floatAt(F,p.x,p.y,'🪱→','#ff6347')}}}}if(u.key==='salt'){u.saltTimer+=dt;if(u.saltTimer>=12){u.saltTimer-=12;u._saltReady=true}}if(u.snowStun>0){u.snowStun-=dt;u.el.style.opacity=.35;continue}if(u.key==='uran'){u.inc+=dt;if(u.inc>=5){u.inc-=5;F.sparkles+=uranIncome(u);const p=cellPos(u.cell);floatAt(F,p.x,p.y,'+'+uranIncome(u)+'✨','#9dff5a')}}if(u.key==='battery'){u.inc+=dt;if(u.inc>=4){u.inc-=4;const c=F.cells.filter(v=>v&&v!==u);if(c.length){const v=c[Math.floor(Math.random()*c.length)];v.buffAdd=Math.min(0.40,v.buffAdd+battPct(u)/100);v.buffT=12;const p=cellPos(v.cell);floatAt(F,p.x,p.y,'🔋','#b8ff5a')}}}if(u.key==='algae'){u.inc+=dt;if(u.inc>=45){u.inc-=45;if(Math.random()<0.08&&u.level<9){u.level++;u.lastUp=gameTime;renderUnit(u);const p=cellPos(u.cell);floatAt(F,p.x,p.y,'✳️ +1','#7ed957')}}}if(u.key==='sakura'&&(u.sakuraBloom||u.level===3)){u.inc+=dt;if(u.inc>=25){u.inc-=25;const e=nbOf(u.cell).filter(j=>j>=0&&j<F.cells.length&&!F.cells[j]);if(e.length){addUnit(F,'cherry',e[Math.floor(Math.random()*e.length)]);const p=cellPos(u.cell);floatAt(F,p.x,p.y,'🌸→','#ffb7d0')}else u.inc=20;}}if(u.key==='fern'){u.inc+=dt;const gi=fernGrowInterval(u);if(u.inc>=gi){u.inc-=gi;const e=nbOf(u.cell).filter(j=>j>=0&&j<F.cells.length&&!F.cells[j]);if(e.length){addUnit(F,'fern',e[Math.floor(Math.random()*e.length)]);const p=cellPos(u.cell);floatAt(F,p.x,p.y,'🪴+','#7ed957')}else u.inc=gi-2;}}if(u.key==='teddy'){u.inc+=dt;if(u.inc>=30){u.inc-=30;if(Math.random()<0.45){const nb=nbOf(u.cell).filter(j=>j>=0&&j<F.cells.length&&F.cells[j]&&F.cells[j]!==u);if(nb.length){const v=F.cells[nb[Math.floor(Math.random()*nb.length)]];v.stun=30;const p=cellPos(v.cell);floatAt(F,p.x,p.y,'💤','#a0663a')}}}}if(u.key==='portal'){u.inc+=dt;if(u.inc>=2){u.inc-=2;if(Math.random()<portalChance(F,u)&&F.portals.length<5)F.portals.push({d:40+Math.random()*(pathLen-80),t:1,used:{}})}}if(u.key==='radar'){u.inc+=dt;if(u.inc>=60){u.inc-=60;if(Math.random()<0.1){u.stun=15;radarDown=20;const p=cellPos(u.cell);floatAt(F,p.x,p.y,'📡!','#7fffd4')}}}if(u.key==='eclipse'){u.inc+=dt;if(u.inc>=10){u.inc-=10;const d=40+Math.random()*(pathLen-80);F.darkZones.push({d,t:4,dead:false});const[x,y]=pointAt(d);floatAt(F,x,y,'🌑','#4a0080')}}if(u.stun>0){u.stun-=dt;u.el.style.opacity=.45;continue}else if(u.el.style.opacity&&!u._awake&&u.key==='sleepy'){}else if(u.el.style.opacity)u.el.style.opacity='';if(u.key==='magnet'){u.magT=(u.magT||0)+dt;if(u.magT>=8){u.magT-=8;compressWave(F,0.45);const mp=cellPos(u.cell);floatAt(F,mp.x,mp.y,'🧲 45%','#ff5da0')}}if(u.key==='radar'&&(riskOnField(F)||radarDown>0||anyRadarDisabled(F))){u.t=0.2;continue}if(u.key==='gem'&&anyNb(F,u)){u.t=0.2;continue}if(u.key==='vase'&&riskOnField(F)){u.t=0.2;continue}if(u.key==='station'){u.t=0.5;continue}if(u.key==='snake'&&rowHasAtkSup(F,u)){u.t=0.2;continue}if(u.key==='star'&&!starOk(F,u)){u.t=0.2;continue}if(u.key==='capri'&&!capriOk(F,u)){u.t=0.2;continue}const hgBlocker=F.cells.find(v=>v&&v.key==='hourglass'&&v.level>=3&&hourglassBlocks(F,v));if(hgBlocker){const hb=nbOf(hgBlocker.cell);if(u.cell>=0&&hb.includes(u.cell)&&u.key!=='hourglass'){u.t=0.2;continue}}u.t-=dt;if(u.t>0)continue;if(u.key==='amur'){const tg=pickT(F);if(tg&&tg.type!=='b'){tg.hp=Math.min(tg.max,tg.hp+amurHeal(F,u));if(Math.random()<amurWard(u))F.ward=5;u.t=1/unitRate(F,u)}else u.t=0.3;continue}if(u.key==='lady'){const tg=pickT(F);if(tg&&tg.type!=='b'&&tg.type!=='a'){const p=cellPos(u.cell);F.projs.push({x:p.x,y:p.y-10,tg,key:'lady',dmg:0,srcU:u,dead:false});u.t=1/unitRate(F,u)}else u.t=0.3;continue}if(u.key==='olive'){const tg=pickT(F);if(tg){fire(F,u,tg);if(F.vines.length<9&&Math.random()<0.45)F.vines.push({d:40+Math.random()*(pathLen-80)});u.t=1/unitRate(F,u)}else u.t=0.1;continue}if(u.key==='cherry'){const a=pickT(F),b=pickL(F);if(a){fireFull(F,u,a);fireFull(F,u,b||a);u.t=1/unitRate(F,u)}else u.t=0.1;continue}if(u.key==='planet'){const pm=planetMod(F,u);if(pm.dis){u.t=0.2;continue}const tg=pickL(F);if(tg){const p=cellPos(u.cell);F.projs.push({x:p.x,y:p.y-10,tg,key:'planet',dmg:Math.round(unitDmg(F,u)*pm.m*10)/10,srcU:u,dead:false});u.t=1/(unitRate(F,u)*pm.m)}else u.t=0.1;continue}if(u.key==='dog'){const dm=dogMod(F,u);const tg=pickT(F);if(tg){const p=cellPos(u.cell);F.projs.push({x:p.x,y:p.y-10,tg,key:'dog',dmg:unitDmg(F,u),srcU:u,dead:false});u.t=1/unitRate(F,u)}else u.t=0.1;continue}if(u.key==='triangle'){const tg=pickT(F);if(tg){fire(F,u,tg);u.t=1/unitRate(F,u)}else u.t=0.1;continue}if(u.key==='yarn'){if(F.balls.length<15)F.balls.push({d:pathLen-4,speed:140,dmg:unitDmg(F,u),hits:[],dead:false});u.t=1/unitRate(F,u);continue}if(u.key==='vase'){const v=vasePick(F,u);if(!v){u.t=0.3;continue}const tg=pickT(F);if(tg){const p=cellPos(u.cell);F.projs.push({x:p.x,y:p.y-10,tg,key:'vase',dmg:unitDmg(F,u),srcU:u,dead:false});u.t=1/unitRate(F,u)}else u.t=0.1;continue}if(u.key==='hook'){const tg=pickT(F);if(tg){const hitCh=0.10+0.025*((u.level-1)+u.tier);if(Math.random()<hitCh){const p=cellPos(u.cell);F.projs.push({x:p.x,y:p.y-10,tg,key:'hook',dmg:73,srcU:u,dead:false,hookHit:true});F.sparkles+=25;floatAt(F,p.x,p.y,'+25✨','#ffd23f')}else{const p=cellPos(u.cell);floatAt(F,p.x,p.y,'🪝','#888')}u.t=1/unitRate(F,u)}else u.t=0.1;continue}if(u.key==='lava'){const tg=pickT(F);if(tg){fire(F,u,tg);u.t=1/unitRate(F,u)}else u.t=0.1;continue}if(u.key==='bubble'){const tg=pickType(F,['f','v','h']);if(tg){fire(F,u,tg);u.t=1/unitRate(F,u)}else u.t=0.1;continue}if(u.key==='worm'){const tg=pickType(F,['v','b']);if(tg){fire(F,u,tg);u.t=1/unitRate(F,u)}else u.t=0.1;continue}if(u.key==='tomato'){const tg=pickType(F,['b']);if(tg){fire(F,u,tg);u.t=1/unitRate(F,u)}else u.t=0.1;continue}if(u.key==='can'){const tg=randT(F);if(tg){const p=cellPos(u.cell);const dmg=unitDmg(F,u);F.projs.push({x:p.x,y:p.y-10,tg,key:'can',dmg,srcU:u,dead:false});if(Math.random()<canMultiChance(u)){const tg2=randT(F);if(tg2&&tg2!==tg)F.projs.push({x:p.x,y:p.y-10,tg:tg2,key:'can',dmg,srcU:u,dead:false})}u.t=1/unitRate(F,u)}else u.t=0.1;continue}if(u.key==='salt'){const tg=pickT(F);if(tg){const p=cellPos(u.cell);const willSlow=u._saltReady&&Math.random()<saltSlowChance(u);F.projs.push({x:p.x,y:p.y-10,tg,key:'salt',dmg:unitDmg(F,u),srcU:u,dead:false,saltHit:willSlow});if(willSlow)u._saltReady=false;u.t=1/unitRate(F,u)}else u.t=0.1;continue}const tg=u.key==='astra'?randT(F):pickT(F);if(tg){fire(F,u,tg);u.t=1/unitRate(F,u)}else u.t=0.1}for(const p of F.projs){if(p.tg.dead||p.tg.hp<=0){p.dead=true;continue}const[tx,ty]=pointAt(p.tg.d);const dx=tx-p.x,dy=ty-p.y,d=Math.hypot(dx,dy);if(d<14){hitM(F,p);p.dead=true;continue}p.x+=dx/d*BAL.projSpeed*dt;p.y+=dy/d*BAL.projSpeed*dt}for(const s of F.spikes){for(const m of F.monsters)if(!m.dead&&Math.abs(m.d-s.d)<12){damage(F,m,s.dmg,'sup',null);s.dead=true;const[x,y]=pointAt(s.d);floatAt(F,x,y,'🌹','#ff5d7a');break}}F.monsters=F.monsters.filter(m=>!m.dead);F.projs=F.projs.filter(p=>!p.dead);F.spikes=F.spikes.filter(s=>!s.dead);F.barrels=F.barrels.filter(s=>!s.dead);if(F.spawned>=waveSize(F.level)&&F.monsters.length===0){F.level++;F.spawned=0;F.levelKills=0;F.spawnT=Math.max(0.3,BAL.spawnInt(F.level)*0.6);F.monHp=BAL.monHpFor(F.level);F.monSpeed=BAL.monSpd(F.level);F.sparkles+=BAL.levelBonus;const mel=F.cells.filter(v=>v&&v.key==='melon').length;F.sparkles+=30*mel;floatAt(F,210,300,t('lvlUp')+F.level+'!','#ffd93d')}if(F.lives<=0){F.over=true;F.finalLevel=F.level;if(mode==='dual')checkDuelEnd();else gameOver()}}
+function checkDuelEnd(){if(!fields[0].over||!fields[1].over)return;const L0=fields[0].finalLevel,L1=fields[1].finalLevel;let title,stats;if(L0>L1){title=`🏆 ${t('winner')}${dualNames[0]}!`;stats=`<span class="dualWinner" style="color:${dualColors[0]}">${dualNames[0]}</span> 🌊${L0}<br><span class="dualLoser" style="color:${dualColors[1]}">${dualNames[1]}</span> 🌊${L1}`}else if(L1>L0){title=`🏆 ${t('winner')}${dualNames[1]}!`;stats=`<span class="dualLoser" style="color:${dualColors[0]}">${dualNames[0]}</span> 🌊${L0}<br><span class="dualWinner" style="color:${dualColors[1]}">${dualNames[1]}</span> 🌊${L1}`}else{title=t('draw');stats=`<span class="dualWinner" style="color:${dualColors[0]}">${dualNames[0]}</span> 🌊${L0}<br><span class="dualWinner" style="color:${dualColors[1]}">${dualNames[1]}</span> 🌊${L1}`}const winner=L0>=L1?0:1;const rec={n:dualNames[winner],k:fields[winner].totalKills,l:fields[winner].finalLevel,t:Math.floor(gameTime),d:`${dualNames[0]} vs ${dualNames[1]}`,c:dualColors[winner],win:true};const loserRec={n:dualNames[1-winner],k:fields[1-winner].totalKills,l:fields[1-winner].finalLevel,t:Math.floor(gameTime),d:'',c:dualColors[1-winner],win:false};clearSave();gameOverCustom(title,stats,[rec,loserRec],'duel')}
+function fire(F,u,tg){const p=cellPos(u.cell);let dmg=unitDmg(F,u);if(u.key==='astra'&&u.tier>=4&&Math.random()<0.08){dmg*=2;floatAt(F,p.x,p.y,'🏵️×2!','#ff9a3d')}F.projs.push({x:p.x,y:p.y-10,tg,key:u.key,dmg:dmg,srcU:u,dead:false});skills(F,u)}
+function fireFull(F,u,tg){const p=cellPos(u.cell);F.projs.push({x:p.x,y:p.y-10,tg,key:'cherry',dmg:unitDmg(F,u),srcU:u,dead:false})}
+function skills(F,u){const ch=skillChance(u);if(u.key==='rose'&&ch>0&&Math.random()<ch&&F.spikes.length<30){const d=50*Math.floor(Math.random()*Math.floor((pathLen-80)/50))+40;F.spikes.push({d,dmg:spikeDmg(F,u),dead:false})}if(u.key==='barrel'&&ch>0&&Math.random()<ch&&F.barrels.length<MAX_BARRELS){const front=pickT(F)?pickT(F).d:0;const maxBD=pathLen*BARREL_MAX_DIST_RATIO;const d=Math.max(60,Math.min(maxBD,front+60+Math.random()*120));const gap=pathLen*BARREL_GAP_RATIO;if(!F.barrels.some(s=>Math.abs(s.d-d)<gap)){const hp=barrelHpOf(F,u);F.barrels.push({d,hp,max:hp,life:BARREL_HOLD(u),dead:false});}}if(u.key==='solar'&&ch>0&&Math.random()<ch&&F.rays.length<4)F.rays.push({id:Math.random(),d:40+Math.random()*(pathLen-80),t:1.5,dmg:rayDmg(F,u)});if(u.key==='cloud'&&ch>0&&Math.random()<ch&&F.clouds.length<4)F.clouds.push({d:40+Math.random()*(pathLen-80),t:8,dps:cloudDps(F,u)})}
+function hitM(F,p){const m=p.tg;if(p.key==='lady'){if(p.srcU&&Math.random()<ladyChance(p.srcU)&&!m.dead&&m.type!=='b'&&m.type!=='a'){m.retreat=true;const[x,y]=pointAt(m.d);floatAt(F,x,y,'👠','#ff77c8')}return}if(p.key==='ball'&&Math.random()<0.01){const[x,y]=pointAt(m.d);floatAt(F,x,y,'0','#fff');return}const srcGrp=p.srcU?CHARS[p.srcU.key].grp:null;const srcKey=p.srcU?p.srcU.key:null;if(p.key==='grape'){for(const o of F.monsters)if(!o.dead&&o.type!=='b')damage(F,o,p.dmg,'atk','grape',p.srcU);return}damage(F,m,p.dmg,srcGrp,srcKey,p.srcU);if(p.key==='salt'&&p.saltHit&&!m.dead){m.saltSlow=20;const[x,y]=pointAt(m.d);floatAt(F,x,y,'🧂','#ffffff')}if(p.key==='donut'&&p.srcU&&p.srcU.tier>=4&&!m.dead&&Math.random()<0.35){m.frozen=2;const[x,y]=pointAt(m.d);floatAt(F,x,y,'🥯','#d9a066')}if(p.key==='lion'&&m.dead&&F.monsters.every(o=>o.dead)&&p.srcU&&Math.random()<0.30){F.sparkles+=5;const[x,y]=pointAt(m.d);floatAt(F,x,y,'+5✨','#ffee33')}if(p.key==='ext'&&p.srcU&&!m.dead&&m.type!=='a')m.burn=extBps(p.srcU);if(p.key==='lava'&&p.srcU&&!m.dead){if(Math.random()<lavaTrailChance(p.srcU)){const d=m.d;const dps=Math.round(m.hp*0.15);F.lavas.push({d,t:3,dps,dead:false})}}if(p.key==='triangle'&&m.dead&&F.monsters.every(o=>o.dead)&&F.ttraps.length<3&&p.srcU){const d=40+Math.random()*(pathLen-80);F.ttraps.push({d,dmg:triTrapDmg(F,p.srcU),dead:false});const[x,y]=pointAt(d);floatAt(F,x,y,'📐!','#f5f580')}const u=p.srcU;if(p.key==='snow'&&u&&Math.random()<skillChance(u)&&!m.dead&&m.type!=='a'){m.frozen=freezeDur(u);const[x,y]=pointAt(m.d);floatAt(F,x,y,'❄️','#7fd4ff')}if(p.key==='kiwi'&&u&&Math.random()<skillChance(u)){let b=null;for(const o of F.monsters)if(!o.dead&&o.d<m.d-1&&(!b||o.d>b.d))b=o;if(b)damage(F,b,p.dmg,srcGrp,srcKey,p.srcU)}if(p.key==='lava'){for(const s of F.spikes)if(!s.dead&&Math.abs(s.d-m.d)<20){s.dead=true}for(const s of F.barrels)if(!s.dead&&Math.abs(s.d-m.d)<20){s.dead=true}}}
+function damage(F,m,amt,srcGrp,srcKey,srcU=null){if(m.dead||amt<=0)return;if(m.type==='dino'){if(srcGrp==='atk'){}else if(srcGrp==='semi'||srcGrp==='sup'||srcGrp==='risk'){amt=Math.round(amt*0.8);}else{amt=Math.round(amt*0.8);}}if(m.type==='carousel'){const boost=['sakura','lilac','diamond'].includes(srcKey);amt=Math.round(amt*(boost?2.5:0.4));}if(m.type==='pig'&&srcGrp!=='atk')amt=Math.round(amt*0.5);m.hp-=amt;if(m.type==='w'){if(!m.frzCd)m.frzCd=0;if(m.frzCd<=0&&Math.random()<0.05){snowFreeze(F);m.frzCd=1}}if(m.hp<=0){if(srcU&&srcU.key==='eagle'){srcU.eagleKills=(srcU.eagleKills||0)+1;if(srcU.el)renderUnit(srcU);const[ex,ey]=pointAt(m.d);floatAt(F,ex,ey,'🦅+3%','#ff8f3d');}if(m.type==='v'&&!m.child){for(let i=0;i<2;i++)F.monsters.push({id:monSeq++,d:Math.max(0,m.d+(i?6:-6)),hp:m.max*0.4,max:m.max*0.4,frozen:0,speed:m.speed*1.2,type:'v',rw:Math.round(m.rw/2),chew:m.chew,burn:0,retreat:false,child:true,frzCd:0,blockPass:0,saltSlow:0});}m.dead=true;F.sparkles+=m.rw;F.totalKills++;F.levelKills++;const[x,y]=pointAt(m.d);floatAt(F,x,y,'+'+m.rw+'✨','#ffd93d')}}
+function gameOver(){const F=fields[0];if(!F)return;clearSave();const rec={k:F.totalKills,l:F.level,t:Math.floor(gameTime),d:F.deck.map(k=>CHARS[k].e).join(' '),c:'#ffd93d',n:''};gameOverCustom(t('gameOver'),`${t('breach')} ⏱${fmtTime(gameTime)}<br>👾${F.totalKills} · 🌊${F.level}<br>${F.deck.map(k=>CHARS[k].e).join(' ')}`,rec,mode==='challenge'?'chal':'norm')}
+let pendingRec=null;function gameOverCustom(tStr,h,rec,list){gameSeq++;$('blackout').classList.add('hidden');$('deckInfo').classList.add('hidden');$('overTitle').textContent=tStr;$('overStats').innerHTML=h;pendingRec=rec?{rec,list}:null;if(Array.isArray(rec)){for(const r of rec)pushRec(list,r);pendingRec=null;renderRecTabs();renderRecords();show('records');return}$('btnSaveRec').style.display=rec?'':'none';graphPending=null;show('over')}
+$('btnSaveRec').onclick=()=>{if(!pendingRec)return;const{rec,list}=pendingRec;rec.n=$('recName').value.trim()||rec.n||t('player1');rec.c=$('recColorIn').value;pushRec(list,rec);pendingRec=null;renderRecTabs();renderRecords();show('records')};$('btnToMenu').onclick=()=>show('menu');
+function drawField(F){const ctx=F.ctx;ctx.clearRect(0,0,W,H);ctx.lineJoin='round';ctx.lineCap='round';strokePath(F,FULL,52,'#ffd23f');strokePath(F,FULL,42,'#f2f5fc');ctx.strokeStyle='#dfe6f2';ctx.lineWidth=2;for(const tk of TICKS){const nx=-Math.sin(tk.a),ny=Math.cos(tk.a);ctx.beginPath();ctx.moveTo(tk.x-nx*20,tk.y-ny*20);ctx.lineTo(tk.x+nx*20,tk.y+ny*20);ctx.stroke()}ctx.save();ctx.translate(PATH[0][0],PATH[0][1]);ctx.rotate(angleAt(0)+PI/2);ctx.fillStyle='#3ddc6a';ctx.beginPath();ctx.moveTo(0,-12);ctx.lineTo(10,6);ctx.lineTo(-10,6);ctx.fill();ctx.restore();const E=PATH[PATH.length-1];ctx.save();ctx.translate(E[0],E[1]);ctx.rotate(angleAt(PATH.length-1));ctx.fillStyle='#ff4d5e';for(let i=-2;i<=2;i++)ctx.fillRect(i*7-2,-21,4,42);ctx.restore();ctx.textAlign='center';ctx.textBaseline='middle';for(const dz of F.darkZones){const[x,y]=pointAt(dz.d);ctx.fillStyle='rgba(30,0,60,.45)';ctx.beginPath();ctx.arc(x,y,28,0,7);ctx.fill()}for(const lv of F.lavas){const[x,y]=pointAt(lv.d);ctx.fillStyle='rgba(255,69,0,.4)';ctx.beginPath();ctx.arc(x,y,14,0,7);ctx.fill()}for(const r of F.rays){const[x,y]=pointAt(r.d);ctx.fillStyle='rgba(255,93,160,.35)';ctx.beginPath();ctx.arc(x,y,20,0,7);ctx.fill();ctx.fillStyle='rgba(255,93,160,.85)';ctx.beginPath();ctx.arc(x,y,9,0,7);ctx.fill()}for(const c of F.clouds){const[x,y]=pointAt(c.d);ctx.fillStyle='rgba(120,140,180,.35)';ctx.beginPath();ctx.arc(x,y,22,0,7);ctx.fill();ctx.font='20px serif';ctx.fillText('🌧️',x,y)}ctx.font='20px serif';for(const p of F.portals){const[x,y]=pointAt(p.d);ctx.fillText('💠',x,y)}for(const tr of F.ttraps){const[x,y]=pointAt(tr.d);ctx.fillText('📐',x,y)}for(const v of F.vines){const[x,y]=pointAt(v.d);ctx.fillText('🫒',x,y)}for(const s of F.spikes){const[x,y]=pointAt(s.d);ctx.fillText('🌹',x,y)}for(const s of F.barrels){const[x,y]=pointAt(s.d);ctx.font='22px serif';ctx.fillText('🛢️',x,y);ctx.fillStyle='#333';ctx.fillRect(x-14,y-20,28,4);ctx.fillStyle='#5ab8ff';ctx.fillRect(x-14,y-20,28*Math.max(0,s.hp/s.max),4)}for(const b of F.balls){const[x,y]=pointAt(b.d);ctx.fillStyle='#ff6fa5';ctx.beginPath();ctx.arc(x,y,7,0,7);ctx.fill()}for(const m of F.monsters){const[x,y]=pointAt(m.d),TM=MT[m.type]||MT.n;if(m.frozen>0){ctx.fillStyle='rgba(120,200,255,.45)';ctx.beginPath();ctx.arc(x,y,TM.s*0.62,0,7);ctx.fill()}if(m.burn>0){ctx.fillStyle='rgba(255,107,77,.4)';ctx.beginPath();ctx.arc(x,y,TM.s*0.62,0,7);ctx.fill()}if(m.saltSlow>0){ctx.fillStyle='rgba(255,255,255,.3)';ctx.beginPath();ctx.arc(x,y,TM.s*0.5,0,7);ctx.fill()}ctx.font=TM.s+'px serif';ctx.fillText(TM.e,x,y);ctx.fillStyle='#333';ctx.fillRect(x-TM.bw/2,y-TM.s*0.85,TM.bw,5);ctx.fillStyle='#3ddc6a';ctx.fillRect(x-TM.bw/2,y-TM.s*0.85,TM.bw*Math.max(0,m.hp/m.max),5)}for(const p of F.projs){ctx.fillStyle=CHARS[p.key]?CHARS[p.key].col:'#fff';ctx.beginPath();ctx.arc(p.x,p.y,5,0,7);ctx.fill()}}
+function strokePath(F,pts,w,col){F.ctx.strokeStyle=col;F.ctx.lineWidth=w;F.ctx.beginPath();F.ctx.moveTo(pts[0][0],pts[0][1]);for(const p of pts)F.ctx.lineTo(p[0],p[1]);F.ctx.stroke()}
+let last=performance.now();function loop(t2){requestAnimationFrame(loop);let dt=(t2-last)/1000;last=t2;if(dt>0.1)dt=0.1;if(state==='game'&&!paused){gameTime+=dt;if(radarDown>0)radarDown-=dt;saveAcc+=dt;if(saveAcc>3){saveAcc=0;saveGame()}for(const F of fields)stepField(F,dt);for(const F of fields)drawField(F);updateHUD();}}
+requestAnimationFrame(loop);fit();refreshContinue();computeSha();
+applyLang();
+</script></body></html>
