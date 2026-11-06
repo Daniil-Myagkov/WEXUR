@@ -1,0 +1,90 @@
+WEXUR — Wave EXpansion URge
+Copyright © 2026 Daniil Vasilievich Myagkov (Мягков Даниил Васильевич).
+All rights reserved.
+
+ORIGINAL WORK NOTICE
+--------------------
+This software ("WEXUR") is the original creative work of Daniil 
+Vasilievich Myagkov. The authorship notice embedded in the source 
+code, documentation, and user interface MUST NOT be removed, altered, 
+obfuscated, or replaced under any circumstances.
+
+PERMITTED USES
+--------------
+You MAY:
+  • Download and run this software privately.
+  • Host the unmodified files on personal websites, blogs, portfolios, 
+    or educational platforms.
+  • Share links to the official repository or copies of the unmodified 
+    distribution package.
+  • Study the source code for learning purposes.
+  • Report bugs, suggest improvements, and contribute issues/pull 
+    requests to the upstream project (subject to maintainer review).
+  • Create public forks ON GITHUB ONLY that preserve all authorship 
+    notices, copyright headers, and link back to the original 
+    repository. Such forks must clearly state they are derived works 
+    and not endorsed by the original author.
+
+PROHIBITED USES
+---------------
+Without explicit WRITTEN PERMISSION from the author, you MAY NOT:
+  • Sell, rent, lease, sublicense, or commercially exploit this 
+    software or any part thereof.
+  • Bundle this software inside paid products, subscription services, 
+    apps requiring purchase, advertisements-supported distributions, 
+    or any monetized offering.
+  • Remove, modify, obscure, or replace the authorship notice, 
+    copyright header, meta tags, footer credits, or any attribution 
+    mechanism present in the source.
+  • Claim authorship, ownership, or originality of this work or any 
+    substantial portion of it.
+  • Distribute modified versions publicly without prominent marking 
+    indicating changes AND retaining full original attribution.
+  • Use the name "WEXUR", associated logos, or the author's name in 
+    marketing materials implying endorsement by the author.
+  • Reverse-engineer, decompile, or disassemble compiled/minified 
+    builds for the purpose of creating competing proprietary clones.
+  • Submit this work (or trivially modified variants) to app stores, 
+    game portals, competitions, or asset marketplaces as your own.
+
+DERIVATIVE WORKS
+----------------
+Derivative works (translations, ports to other engines/platforms, 
+significant rewrites, spin-offs sharing mechanics/characters/code) 
+require prior written consent from the author. Non-trivial artistic 
+adaptations (fan art, Let's Plays, reviews, streams) are encouraged 
+provided they credit the original and do not misrepresent themselves 
+as official releases.
+
+DISCLAIMER OF WARRANTY
+----------------------
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER 
+LIABILITY ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR 
+THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+DATA PRIVACY
+------------
+The software operates entirely client-side using localStorage for 
+saving progress, settings, and records. No data is transmitted to any 
+server operated by the author or third parties. Users retain full 
+control over their local save data.
+
+VERSIONING
+----------
+This license applies to version 1.1 and subsequent updates unless 
+explicitly superseded by newer license texts shipped alongside those 
+updates. Historical versions remain governed by the terms effective 
+at release time.
+
+CONTACT
+-------
+For questions regarding licensing, permissions, collaborations, or 
+commercial opportunities, please reach out through the official 
+GitHub repository's Issues page or via direct message to the author.
+
+───────────────────────────────────────────────────────────────────────
+END OF LICENSE TEXT
+© 2026 Daniil Vasilievich Myagkov. All rights reserved.
