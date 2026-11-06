@@ -1,10 +1,7 @@
 # WEXUR — Wave EXpansion URge
 
-**A strategic merge tower-defense game built as a single-file HTML5 application.**
+**A strategic merge tower-defense game.
 
-![WEXUR](https://img.shields.io/badge/version-1.1-blue) ![License](https://img.shields.io/badge/license-Proprietary-red) ![Languages](https://img.shields.io/badge/languages-RU%20%7C%20EN%20%7C%20ES%20%7C%20FR%20%7C%20ZH-green)
-
----
 
 ## 🎮 About the Game
 
@@ -24,21 +21,6 @@
 - **Records System** — three leaderboards (Normal / Challenge / Duels) saved locally via `localStorage`.
 - **5-Language Localization** — Russian, English, Spanish, French, Chinese (switchable in-game).
 - **Fully Offline** — no server, no accounts, no tracking. Just open the `.html` file.
-
----
-
-## 🚀 How to Run
-
-No build tools required. Simply download `WEXUR.html` and open it in any modern browser (Chrome, Firefox, Edge, Safari, Brave…). Works on desktop and mobile.
-
-```bash
-# Option 1: just double-click the file
-open WEXUR.html
-
-# Option 2: serve locally for best experience
-python3 -m http.server 8000
-# then visit http://localhost:8000/WEXUR.html
-```
 
 ---
 
@@ -109,35 +91,4 @@ Some units cannot move from their cell: 🪩 disco ball, ☢️ uranium, 🎥 ca
 
 ---
 
-## 📜 License
-
-See [LICENSE.txt](./LICENSE.txt). In short:
-
 > © 2026 Daniil Vasilievich Myagkov. All rights reserved.  
-> You may host and share this file unchanged, with authorship intact.  
-> Commercial use, paid redistribution, and closed-source derivatives require written permission.
-
----
-
-## 👤 Author
-
-**Daniil Vasilievich Myagkov** (Мягков Даниил Васильевич)  
-Also creator of [QFTM-1024](https://github.com/yourusername/qftm-1024) — a scientific personality typing system based on Big Five.
-
----
-
-## 🙏 Acknowledgements
-
-- Emoji set: Unicode Consortium standard emoji glyphs rendered by OS fonts.
-- Inspiration: classic merge games (2048, Merge Dragons!), tower defense staples (Bloons TD, Kingdom Rush), and roguelite deck-builders (Slay the Spire).
-- Testing feedback: friends and family who endured dozens of balance iterations.
-
----
-
-## 📬 Contact
-
-For commercial licensing inquiries, derivative permissions, or bug reports, please open an issue on GitHub or contact the author directly.
-
----
-
-*Built with ❤️ and far too many hours of playtesting.*
